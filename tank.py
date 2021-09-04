@@ -84,14 +84,18 @@ while True:
 	for event in pygame.event.get():
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_d:
-				right()
+                right()
+                print("→")
 			if event.key == pygame.K_a:
+                print('←')
 				left()
 			if event.key == pygame.K_w:
+                print('↑')
 				forward()
 			if event.key == pygame.K_s:
+                print('↓')
 				backward()
 			if event.key == pygame.K_q:
 				pygame.quit()
 		elif event.type == pygame.KEYUP:
-			print('No key pressed')
+			idle()
