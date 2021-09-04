@@ -13,11 +13,11 @@ screen = pygame.display.set_mode([240, 160])
 while True:
 	for event in pygame.event.get():
 		if event.type == pygame.KEYDOWN:
-			if event.key == pygame.K_w:
-				print('Right')
 			if event.key == pygame.K_d:
-				print('Left')
+				print('Right')
 			if event.key == pygame.K_a:
+				print('Left')
+			if event.key == pygame.K_w:
 				print('Up')
 			if event.key == pygame.K_s:
 				print('Down')
