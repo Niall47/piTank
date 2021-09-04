@@ -10,23 +10,6 @@ GPIO.setup(15,GPIO.OUT)
 
 screen = pygame.display.set_mode([240, 160])
 
-while True:
-	for event in pygame.event.get():
-		if event.type == pygame.KEYDOWN:
-			if event.key == pygame.K_d:
-				print('Right')
-			if event.key == pygame.K_a:
-				print('Left')
-			if event.key == pygame.K_w:
-				print('Up')
-			if event.key == pygame.K_s:
-				print('Down')
-			if event.key == pygame.K_q:
-				pygame.quit()
-		elif event.type == pygame.KEYUP:
-			print('No key pressed')
-
-
 def forward():
     print ('Forward')
     GPIO.output(7,True)
@@ -96,3 +79,19 @@ def shutdown():
     GPIO.output(13,False)
     GPIO.output(15,False)
     GPIO.cleanup()
+
+while True:
+	for event in pygame.event.get():
+		if event.type == pygame.KEYDOWN:
+			if event.key == pygame.K_d:
+				right()
+			if event.key == pygame.K_a:
+				left()
+			if event.key == pygame.K_w:
+				forward()
+			if event.key == pygame.K_s:
+				backward()
+			if event.key == pygame.K_q:
+				pygame.quit()
+		elif event.type == pygame.KEYUP:
+			print('No key pressed')
