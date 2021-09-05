@@ -8,6 +8,7 @@ W_Key = False
 A_Key = False
 S_Key = False
 D_Key = False
+PreviousPayload = {}
 
 
 def send_inputs():
@@ -38,12 +39,18 @@ def send_inputs():
 
     # conn.close()  # close the connection
 def OnKeyPress(event):
+    global PreviousPayload
     WhatKey(event.Key, True)
-    connection.send(json.dumps(FormatMessage()).encode())
+    if (FormatMessage() != PreviousPayload):
+        connection.send(json.dumps(FormatMessage()).encode())
+        PreviousPayload = FormatMessage()
 
 def OnKeyRelease(event):
+    global PreviousPayload
     WhatKey(event.Key, False)
-    connection.send(json.dumps(FormatMessage()).encode())
+    if (FormatMessage() != PreviousPayload):
+        connection.send(json.dumps(FormatMessage()).encode())
+        PreviousPayload = FormatMessage()
 
 def WhatKey(key, action):
     global W_Key
@@ -65,6 +72,7 @@ def FormatMessage():
     global A_Key
     global S_Key
     global D_Key
+    global PreviousPayload
     return {
         "W": W_Key,
         "A": A_Key,
@@ -72,10 +80,7 @@ def FormatMessage():
         "D": D_Key
         }
 
-
-
-
-
+    
 
 if __name__ == '__main__':
     connection = ''
