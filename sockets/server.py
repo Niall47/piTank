@@ -1,8 +1,8 @@
-from re import A
 import socket
 import time
 import pyxhook
 import os
+import json
 
 W_Key = False
 A_Key = False
@@ -38,42 +38,44 @@ def send_inputs():
 
     # conn.close()  # close the connection
 def OnKeyPress(event):
-    global W_Key
-    global A_Key
-    global S_Key
-    global D_Key
-
-    print (event.Key)
-    if event.Key == 'w':
-        W_Key = True
-    elif event.Key == 'a':
-        A_Key = True
-    elif event.Key == 's':
-        S_Key = True
-    elif event.Key == 'd':
-        D_Key = True
-    input = {W_Key, A_Key, S_Key, D_Key}
-    input = '{}{}{}{}'.format(W_Key, A_Key, S_Key, D_Key)
-    connection.send(input.encode())
+    WhatKey(event.Key, True)
+    connection.send(json.dumps(FormatMessage()).encode())
 
 def OnKeyRelease(event):
+    WhatKey(event.Key, False)
+    connection.send(json.dumps(FormatMessage()).encode())
+
+def WhatKey(key, action):
     global W_Key
     global A_Key
     global S_Key
     global D_Key
 
-    print (event.Key)
-    if event.Key == 'w':
-        W_Key = False
-    elif event.Key == 'a':
-        A_Key = False
-    elif event.Key == 's':
-        S_Key = False
-    elif event.Key == 'd':
-        D_Key = False
-    input = {W_Key, A_Key, S_Key, D_Key}
-    input = '{}{}{}{}'.format(W_Key, A_Key, S_Key, D_Key)
-    connection.send(input.encode())
+    if key == 'w':
+        W_Key = action
+    elif key == 'a':
+        A_Key = action
+    elif key == 's':
+        S_Key = action
+    elif key == 'd':
+        D_Key = action
+        
+def FormatMessage():
+    global W_Key
+    global A_Key
+    global S_Key
+    global D_Key
+    return {
+        "W": W_Key,
+        "A": A_Key,
+        "S": S_Key,
+        "D": D_Key
+        }
+
+
+
+
+
 
 if __name__ == '__main__':
     connection = ''
