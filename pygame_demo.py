@@ -9,15 +9,7 @@ GPIO.setup(11,GPIO.OUT)
 GPIO.setup(13,GPIO.OUT)
 GPIO.setup(15,GPIO.OUT)
 GPIO.setup(16, GPIO.OUT)
-
-screen = pygame.display.set_mode([240, 160])
-
-def forward():
-    GPIO.output(7,True)
-    GPIO.output(15,True)
-    GPIO.output(11,False)
-    GPIO.output(13,True)
-
+GPIO.output(16, True)
 
 def backward():
     GPIO.output(11,True)

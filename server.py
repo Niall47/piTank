@@ -72,15 +72,12 @@ def FormatMessage():
     global A_Key
     global S_Key
     global D_Key
-    global PreviousPayload
     return {
         "W": W_Key,
         "A": A_Key,
         "S": S_Key,
         "D": D_Key
         }
-
-    
 
 if __name__ == '__main__':
     connection = ''
