@@ -75,7 +75,8 @@ def idle():
     GPIO.output(15,False)
 
 def client():
-    host = socket.gethostname()
+    host = 'War-Rig'
+    # host = socket.gethostname()
     port = 5000
 
     client_socket = socket.socket()
