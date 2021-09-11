@@ -10,8 +10,6 @@ S_Key = False
 D_Key = False
 PreviousPayload = {}
 
-
-
 def send_inputs():
     global connection
 
@@ -37,7 +35,7 @@ def send_inputs():
             pass
         except Exception as ex:
             print(ex)
-        # conn.send('helloworld'.encode())  # send data to the client
+
 
     # conn.close()  # close the connection
 def OnKeyPress(event):

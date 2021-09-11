@@ -16,7 +16,7 @@ def led(status):
     if status == 'on':
         GPIO.output(16,True)
     else:
-        GPIO.output(16,True)
+        GPIO.output(16,False)
     
 
 def cleanup():
@@ -28,56 +28,48 @@ def cleanup():
     GPIO.cleanup()
 
 def forward():
-    print('Moving forward')
     GPIO.output(7,True)
     GPIO.output(15,True)
     GPIO.output(11,False)
     GPIO.output(13,True)
 
 def backward():
-    print('Moving backward')
     GPIO.output(11,True)
     GPIO.output(7,True)
     GPIO.output(15,False)
     GPIO.output(13,True)
 
 def left():
-    print('Moving left')
     GPIO.output(11,True)
     GPIO.output(7,True)
     GPIO.output(13,True)
     GPIO.output(15,True)
 
 def right():
-    print('Moving right')
     GPIO.output(7,True)
     GPIO.output(13,True)
     GPIO.output(15,False)
     GPIO.output(11,False)
 
 def left_forward():
-    print('Moving left forward')
     GPIO.output(7,True)
     GPIO.output(11,False)
     GPIO.output(13,False)
     GPIO.output(15,False)
 
 def left_backward():
-    print('Moving left backward')
     GPIO.output(11,True)
     GPIO.output(7,True)
     GPIO.output(13,False)
     GPIO.output(15,False)
 
 def right_forward():
-    print('Moving backward')
     GPIO.output(13,True)
     GPIO.output(7,False)
     GPIO.output(11,False)
     GPIO.output(15,False)
 
 def right_backward():
-    print('Moving right backward')
     GPIO.output(15,True)
     GPIO.output(7,False)
     GPIO.output(11,False)
@@ -123,7 +115,6 @@ def UpdateSteering(i):
         left_forward()
     else: 
         idle()
-        print(i)
 
 if __name__ == '__main__':
     cleanup()
