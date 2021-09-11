@@ -1,15 +1,31 @@
 
 import socket
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 import json
+import time
 import pyxtension
 
-# GPIO.setmode(GPIO.BOARD)
-# GPIO.setup(7,GPIO.OUT)
-# GPIO.setup(11,GPIO.OUT)
-# GPIO.setup(13,GPIO.OUT)
-# GPIO.setup(15,GPIO.OUT)
-# GPIO.setup(16, GPIO.OUT)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(7,GPIO.OUT)
+GPIO.setup(11,GPIO.OUT)
+GPIO.setup(13,GPIO.OUT)
+GPIO.setup(15,GPIO.OUT)
+GPIO.setup(16,GPIO.OUT)
+
+def led(status):
+    if status == 'on':
+        GPIO.output(16,True)
+    else:
+        GPIO.output(16,True)
+    
+
+def cleanup():
+    GPIO.output(7,False)
+    GPIO.output(11,False)
+    GPIO.output(13,False)
+    GPIO.output(15,False)
+    GPIO.output(16,False)
+    GPIO.cleanup()
 
 def forward():
     print('Moving forward')
@@ -75,7 +91,7 @@ def idle():
     GPIO.output(15,False)
 
 def client():
-    host = 'War-Rig'
+    host = '192.168.0.47'
     # host = socket.gethostname()
     port = 5000
 

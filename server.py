@@ -11,13 +11,15 @@ D_Key = False
 PreviousPayload = {}
 
 
+
 def send_inputs():
     global connection
 
     new_hook = pyxhook.HookManager()
     new_hook.KeyDown = OnKeyPress
     new_hook.KeyUp = OnKeyRelease
-    host = socket.gethostname()
+    host = '0.0.0.0'
+    # host = socket.gethostname()
     port = 5000
     server_socket = socket.socket()
     server_socket.bind((host, port))
