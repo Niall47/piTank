@@ -2,6 +2,7 @@
 import socket
 import RPi.GPIO as GPIO
 import json
+import logging
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(7,GPIO.OUT)
@@ -106,6 +107,7 @@ def UpdateSteering(i):
         left_forward()
     else: 
         idle()
+        logging.info(i)
 
 
 if __name__ == '__main__':
