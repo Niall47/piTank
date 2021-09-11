@@ -17,7 +17,7 @@ def cleanup():
     GPIO.output(13,False)
     GPIO.output(15,False)
     GPIO.output(16,False)
-    GPIO.cleanup()
+    # GPIO.cleanup()
 
 def forward():
     GPIO.output(7,True)

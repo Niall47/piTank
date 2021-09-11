@@ -18,7 +18,7 @@ def send_inputs():
     new_hook.KeyUp = OnKeyRelease
     host = '0.0.0.0'
     # host = socket.gethostname()
-    port = 5001
+    port = 5000
     server_socket = socket.socket()
     server_socket.bind((host, port))
     server_socket.listen(2)
