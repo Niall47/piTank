@@ -26,7 +26,7 @@ def send_inputs():
     while True:
         conn, address = server_socket.accept()
         connection = conn
-        logging.info("Connection from: " + str(address))
+        logging.debug("Connection from: " + str(address))
         new_hook.HookKeyboard()
         try:
             new_hook.start()

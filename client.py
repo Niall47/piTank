@@ -107,7 +107,7 @@ def UpdateSteering(i):
         left_forward()
     else: 
         idle()
-        logging.info(i)
+        logging.debug(i)
 
 
 if __name__ == '__main__':
