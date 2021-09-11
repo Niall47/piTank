@@ -97,6 +97,7 @@ def client():
 
     client_socket = socket.socket()
     client_socket.connect((host, port))
+    led('on')
 
     while True:
         data = client_socket.recv(1024).decode()
