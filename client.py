@@ -12,13 +12,6 @@ GPIO.setup(13,GPIO.OUT)
 GPIO.setup(15,GPIO.OUT)
 GPIO.setup(16,GPIO.OUT)
 
-def led(status):
-    if status == 'on':
-        GPIO.output(16,True)
-    else:
-        GPIO.output(16,False)
-    
-
 def cleanup():
     GPIO.output(7,False)
     GPIO.output(11,False)
@@ -89,7 +82,7 @@ def client():
 
     client_socket = socket.socket()
     client_socket.connect((host, port))
-    led('on')
+    GPIO.output(16,True)
 
     while True:
         data = client_socket.recv(1024).decode()
