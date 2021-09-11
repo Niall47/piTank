@@ -5,13 +5,6 @@ import json
 import time
 import pyxtension
 
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(7,GPIO.OUT)
-GPIO.setup(11,GPIO.OUT)
-GPIO.setup(13,GPIO.OUT)
-GPIO.setup(15,GPIO.OUT)
-GPIO.setup(16,GPIO.OUT)
-
 def cleanup():
     GPIO.output(7,False)
     GPIO.output(11,False)
@@ -109,6 +102,15 @@ def UpdateSteering(i):
     else: 
         idle()
 
+def init():
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(7,GPIO.OUT)
+    GPIO.setup(11,GPIO.OUT)
+    GPIO.setup(13,GPIO.OUT)
+    GPIO.setup(15,GPIO.OUT)
+    GPIO.setup(16,GPIO.OUT)
+
 if __name__ == '__main__':
+    init()
     cleanup()
     client()
