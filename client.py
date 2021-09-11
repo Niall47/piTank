@@ -126,4 +126,5 @@ def UpdateSteering(i):
         print(i)
 
 if __name__ == '__main__':
+    cleanup()
     client()
