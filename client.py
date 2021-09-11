@@ -106,6 +106,8 @@ def UpdateSteering(i):
         left()
     elif i == {'W': True, 'A': True, 'S': False, 'D': False}:
         left_forward()
+    elif i == {"Kill": True}:
+        logging.debug('kill command')
     else: 
         idle()
         logging.debug(i)

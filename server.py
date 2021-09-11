@@ -31,7 +31,7 @@ def send_inputs():
         try:
             new_hook.start()
         except KeyboardInterrupt:
-            connection.send('kill'.encode())
+            connection.send({"Kill": True}.encode())
             conn.close()
             pass
         except Exception as ex:
