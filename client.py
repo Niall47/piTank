@@ -2,8 +2,6 @@
 import socket
 import RPi.GPIO as GPIO
 import json
-import time
-import pyxtension
 
 def cleanup():
     GPIO.output(7,False)
@@ -70,9 +68,7 @@ def idle():
 
 def client():
     host = '192.168.0.47'
-    # host = socket.gethostname()
     port = 5000
-
     client_socket = socket.socket()
     client_socket.connect((host, port))
     GPIO.output(16,True)
@@ -82,7 +78,7 @@ def client():
         UpdateSteering(json.loads(data))
 
 def UpdateSteering(i):
-
+    
     if i == {'W': True, 'A': False, 'S': False, 'D': False}:
         forward()
     elif i == {'W': True, 'A': False, 'S': False, 'D': True}:
@@ -102,15 +98,14 @@ def UpdateSteering(i):
     else: 
         idle()
 
-def init():
-    GPIO.setmode(GPIO.BOARD)
-    GPIO.setup(7,GPIO.OUT)
-    GPIO.setup(11,GPIO.OUT)
-    GPIO.setup(13,GPIO.OUT)
-    GPIO.setup(15,GPIO.OUT)
-    GPIO.setup(16,GPIO.OUT)
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(7,GPIO.OUT)
+GPIO.setup(11,GPIO.OUT)
+GPIO.setup(13,GPIO.OUT)
+GPIO.setup(15,GPIO.OUT)
+GPIO.setup(16,GPIO.OUT)
 
 if __name__ == '__main__':
-    init()
     cleanup()
     client()
