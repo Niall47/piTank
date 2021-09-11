@@ -3,7 +3,15 @@ import socket
 import RPi.GPIO as GPIO
 import json
 
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(7,GPIO.OUT)
+GPIO.setup(11,GPIO.OUT)
+GPIO.setup(13,GPIO.OUT)
+GPIO.setup(15,GPIO.OUT)
+GPIO.setup(16,GPIO.OUT)
+
 def cleanup():
+    print('Resetting GPIO pins')
     GPIO.output(7,False)
     GPIO.output(11,False)
     GPIO.output(13,False)
@@ -67,6 +75,7 @@ def idle():
     GPIO.output(15,False)
 
 def client():
+    print('Connecting to server')
     host = '192.168.0.47'
     port = 5000
     client_socket = socket.socket()
@@ -98,13 +107,6 @@ def UpdateSteering(i):
     else: 
         idle()
 
-
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(7,GPIO.OUT)
-GPIO.setup(11,GPIO.OUT)
-GPIO.setup(13,GPIO.OUT)
-GPIO.setup(15,GPIO.OUT)
-GPIO.setup(16,GPIO.OUT)
 
 if __name__ == '__main__':
     cleanup()
