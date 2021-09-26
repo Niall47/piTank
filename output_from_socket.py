@@ -1,3 +1,7 @@
+import socket
+import json
+
+
 def client():
     print('Connecting to server')
     host = '192.168.0.47'
