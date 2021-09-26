@@ -1,8 +1,8 @@
 import socket
-import time
 import pyxhook
-import os
 import json
+import logging
+
 
 W_Key = False
 A_Key = False
@@ -26,18 +26,18 @@ def send_inputs():
     while True:
         conn, address = server_socket.accept()
         connection = conn
-        print("Connection from: " + str(address))
+        logging.debug("Connection from: " + str(address))
         new_hook.HookKeyboard()
         try:
             new_hook.start()
         except KeyboardInterrupt:
-            # User cancelled
+            connection.send({"Kill": True}.encode())
+            conn.close()
             pass
         except Exception as ex:
             print(ex)
 
 
-    # conn.close()  # close the connection
 def OnKeyPress(event):
     global PreviousPayload
     WhatKey(event.Key, True)

@@ -2,6 +2,7 @@
 import socket
 import RPi.GPIO as GPIO
 import json
+import logging
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(7,GPIO.OUT)
@@ -84,6 +85,7 @@ def client():
 
     while True:
         data = client_socket.recv(1024).decode()
+        logging.debug(data)
         UpdateSteering(json.loads(data))
 
 def UpdateSteering(i):
@@ -104,8 +106,11 @@ def UpdateSteering(i):
         left()
     elif i == {'W': True, 'A': True, 'S': False, 'D': False}:
         left_forward()
+    elif i == {"Kill": True}:
+        logging.debug('kill command')
     else: 
         idle()
+        logging.debug(i)
 
 
 if __name__ == '__main__':
