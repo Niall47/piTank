@@ -9,3 +9,7 @@ def client():
     while True:
         data = client_socket.recv(1024).decode()
         print(data)
+
+if __name__ == '__main__':
+    client()
+
