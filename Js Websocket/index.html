@@ -6,7 +6,10 @@
     <body>
         <h1> Websocket demo</h1>
         <script>
-            
+            const ws = new WebSocket("ws://localhost:8080");
+            ws.addEventListener("open", () => {
+                console.log("We are connected")
+            })
         </script>
     </body>
 </html>
