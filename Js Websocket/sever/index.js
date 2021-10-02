@@ -7,20 +7,35 @@ wss.on("connection", ws => {
 
     ws.on("message", data => {
         let input = `${data}`;
-        console.log(`Client has sent: ${data}`);
+        // console.log(`Client has sent: ${data}`);
 
         switch( input ) {
-            case 'Forward':
-                console.log('GPIO forward');
+            case 'C':
+                console.log("Idle");
                 break;
-            case 'Back':
-                console.log('GPIO back');
+            case 'N':
+                console.log('Forward');
                 break;
-            case 'Left':
-                console.log('GPIO Left');
+            case 'NE':
+                console.log('Forward/Right');
                 break;
-            case 'Right':
-                console.log('GPIO Right');
+            case 'E':
+                console.log('Right');
+                break;
+            case 'SE':
+                console.log('Backward/Right');
+                break;
+            case 'S':
+                console.log('Backward');
+                break;
+            case 'SW':
+                console.log('Backward/Left');
+                break;
+            case 'W':
+                console.log('Left');
+                break;
+            case 'NW':
+                console.log('Forward/Left')
                 break;
             default:
                 console.log(input);

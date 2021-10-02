@@ -27,16 +27,7 @@
 	<head>
 		<title>Joystick</title>
 		<meta charset="utf-8">
-		<meta name="description" content="Example page of use pure Javascript JoyStick">
-		<style>
-
-body
-{
-	margin: 0px;
-	padding: 0px;
-	font-family: monospace;
-}
-		</style>
+		<meta name="description" content="JoyStick">
 		<script src="joy.js"></script>
 	</head>
 	<body>
@@ -45,10 +36,23 @@ body
 			Direction:<input id="joy3Direction" type="text" /><br />
 		</div>
 		<script type="text/javascript">
+			const ws = new WebSocket("ws://localhost:8080");
+            ws.addEventListener("open", () => {
+                console.log("We are connected");
+                ws.send("C");
+            });
+		var previousMessage = "C";
 		var joy3Param = { "title": "joystick3" };
 		var Joy3 = new JoyStick('joy3Div', joy3Param);
 		var joy3Direction = document.getElementById("joy3Direction");
-		setInterval(function(){ joy3Direction.value=Joy3.GetDir(); }, 50);
+		setInterval(function(){
+			previousMessage = `${joy3Direction.value}`;
+			joy3Direction.value=Joy3.GetDir(); 
+			if (previousMessage != joy3Direction.value) {
+				ws.send(joy3Direction.value);
+			}	
+		
+		}, 100);
 		</script>
 	</body>
 </html>
