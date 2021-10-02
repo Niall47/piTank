@@ -50,22 +50,22 @@
 		const restartButton = document.getElementById("restartButton");
 		const shutdownButton = document.getElementById("shutdownButton");
 		let connectionStatus = false;
-
-		var previousMessage = "C";
-		var joyParam = { "title": "joystick" };
+		var previousMessage = "";
+		var joyParam = { "title": "joystick" }; 		// internalFillColor internalStrokeColor externalStrokeColor
 		var Joy = new JoyStick('joyDiv', joyParam);
+
 
 		function shutdown(){
 			if (connectionStatus == true) {
 				ws.send("X");
 			}
-		}
+		};
 
 		function restart(){
 			if (connectionStatus == true) {
 				ws.send("R");
 			}
-		}
+		};
 
 		function connect(ip){
 			console.log(`Trying to connect to ${ip}`)
@@ -84,11 +84,10 @@
 
 		function customConnect() {
 			connect(customInput.value)
-		}
+		};
 		function updateDisplay()
 		{
 			if ( connectionStatus == true ) {
-				console.log('updating connected')
 				customInput.setAttribute('type', 'hidden');
 				connectButton.style.display = "none";
 				shutdownButton.style.display = "block";
@@ -96,7 +95,6 @@
 				status.innerHTML = "Connected"
 				ws.send("C");
 			} else {
-				console.log('updating disconnect')
 				customInput.setAttribute('type', Text);
 				customInput.setAttribute('value', 'localhost');
 				connectButton.style.display = "block";
@@ -104,7 +102,7 @@
 				restartButton.style.display = "none";
 				status.innerHTML = "Not Connected"
 			}
-		}
+		};
 
 		setInterval(function(){
 			previousMessage = `${direction.innerHTML}`;

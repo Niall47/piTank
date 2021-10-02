@@ -1,6 +1,12 @@
+var sys = require('sys');
+var exec = require('child_process').exec;
 const WebSocket = require("ws");
-
 const wss = new WebSocket.Server({ port: 8080 });
+
+// Create shutdown function
+function shellCommand(command="", callback){
+    exec(command, function(error, stdout, stderr){ callback(stdout); });
+}
 
 wss.on("connection", ws => {
     console.log("New client connected");
@@ -37,9 +43,11 @@ wss.on("connection", ws => {
                 break;
             case 'X':
                 console.log('Shutdown');
+                shellCommand(command="shutdown now");
                 break;
             case 'R':
                 console.log('Restart');
+                shellCommand(command="shutdown -r now");
                 break;
             default:
                 console.log(input);
@@ -49,4 +57,8 @@ wss.on("connection", ws => {
     ws.on("close", () => {
         console.log("Client has disconnected");
     });
+
+
+
+
 });
