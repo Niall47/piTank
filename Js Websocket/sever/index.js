@@ -7,8 +7,6 @@ wss.on("connection", ws => {
 
     ws.on("message", data => {
         let input = `${data}`;
-        // console.log(`Client has sent: ${data}`);
-
         switch( input ) {
             case 'C':
                 console.log("Idle");

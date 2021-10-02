@@ -31,28 +31,35 @@
 		<script src="joy.js"></script>
 	</head>
 	<body>
-		<div id="joy3Div" style="width:200px;height:200px;margin:50px;position:fixed;top:30px;left:500px;"></div>
-		<div style="position:fixed;top:125px;left:750px;">
-			Direction:<input id="joy3Direction" type="text" /><br />
-		</div>
-		<script type="text/javascript">
-			const ws = new WebSocket("ws://localhost:8080");
-            ws.addEventListener("open", () => {
-                console.log("We are connected");
-                ws.send("C");
-            });
-		var previousMessage = "C";
-		var joy3Param = { "title": "joystick3" };
-		var Joy3 = new JoyStick('joy3Div', joy3Param);
-		var joy3Direction = document.getElementById("joy3Direction");
-		setInterval(function(){
-			previousMessage = `${joy3Direction.value}`;
-			joy3Direction.value=Joy3.GetDir(); 
-			if (previousMessage != joy3Direction.value) {
-				ws.send(joy3Direction.value);
-			}	
 		
-		}, 100);
+		<div id="joyDiv" style="width:200px;height:200px;margin:50px;position:fixed;top:30px;left:500px;"></div>
+		<div style="position:fixed;top:125px;left:750px;">
+			<h3 id="status" type="text" >Not Connected</h3>
+			<h3 id="direction" type="text" >C</h3>
+		</div>
+
+		<script type="text/javascript">
+		const status = document.getElementById("status");
+		const direction = document.getElementById("direction");
+
+		const ws = new WebSocket("ws://localhost:8080");
+		ws.addEventListener("open", () => {
+			console.log("We are connected");
+			status.innerHTML = "Connected"
+			ws.send("C");
+		});
+
+		var previousMessage = "C";
+		var joyParam = { "title": "joystick" };
+		var Joy = new JoyStick('joyDiv', joyParam);
+
+
+		setInterval(function(){
+			previousMessage = `${direction.innerHTML}`;
+			direction.innerHTML = Joy.GetDir();
+			if (previousMessage != direction.innerHTML) {
+				ws.send(direction.innerHTML);
+			}}, 100);
 		</script>
 	</body>
 </html>
