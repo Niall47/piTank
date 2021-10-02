@@ -33,7 +33,13 @@ wss.on("connection", ws => {
                 console.log('Left');
                 break;
             case 'NW':
-                console.log('Forward/Left')
+                console.log('Forward/Left');
+                break;
+            case 'X':
+                console.log('Shutdown');
+                break;
+            case 'R':
+                console.log('Restart');
                 break;
             default:
                 console.log(input);

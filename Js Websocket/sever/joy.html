@@ -32,12 +32,14 @@
 	</head>
 	<body>
 
-		<div id="joyDiv" style="width:200px;height:200px;margin:50px;position:fixed;top:30px;left:500px;"></div>
-		<div style="position:fixed;top:125px;left:750px;">
+		<div id="joyDiv" style="width:200px;height:200px;margin:50px;position:fixed;top:30px;left:100px;"></div>
+		<div style="position:fixed;top:125px;left:10px;">
 			<input id="customInput" type="hidden"/>
-			<button id="customConnect" hidden> Connect </button>
+			<button id="connectButton" onClick="customConnect()" hidden> Connect </button>
 			<h3 id="status" type="text" >Not Connected</h3>
 			<h3 id="direction" type="text" >C</h3>
+			<button id="restartButton" onClick="restart()" hidden>Restart</button> 
+			<button id="shutdownButton" onClick="shutdown()" hidden>Shutdown</button> 
 		</div>
 
 		<script type="text/javascript">
@@ -45,33 +47,57 @@
 		const direction = document.getElementById("direction");
 		const customInput = document.getElementById("customInput");
 		const connectButton = document.getElementById("connectButton");
+		const restartButton = document.getElementById("restartButton");
+		const shutdownButton = document.getElementById("shutdownButton");
+		let connectionStatus = false;
 
-		
-		const ws = new WebSocket("ws://localhost:8080");
+		var ws = new WebSocket("ws://localhost:8080");
 		ws.onerror = SocketError;
-
-		function SocketError(ev) {
-			console.log("Failed to connect")
-			customInput.setAttribute('type', Text);
-			customConnect.style.display = "block";
-		}
-
-
-		ws.addEventListener("open", () => {
-			console.log("We are connected");
-			status.innerHTML = "Connected"
-			ws.send("C");
-		});
 
 		var previousMessage = "C";
 		var joyParam = { "title": "joystick" };
 		var Joy = new JoyStick('joyDiv', joyParam);
 
+		function SocketError(ev) {
+			connectionStatus = false;
+			console.log("Failed to connect")
+			customInput.setAttribute('type', Text);
+			customInput.setAttribute('value', 'localhost');
+			connectButton.style.display = "block";
+		};
+
+		function shutdown(){
+			ws.send("X");
+		}
+
+		function restart(){
+			ws.send("R");
+		}
+
+		function customConnect(){
+			connectionStatus = true;
+			console.log(`Trying to connect to ${customInput.value}`)
+			const ws = new WebSocket(`ws://${customInput.value}:8080`);
+			shutdownButton.style.display = "block";
+			restartButton.style.display = "block";
+			status.innerHTML = "Connected"
+			ws.send("C");
+
+		}
+
+		ws.addEventListener("open", () => {
+			connectionStatus = true;
+			console.log("We are connected");
+			status.innerHTML = "Connected"
+			ws.send("C");
+			shutdownButton.style.display = "block";
+			restartButton.style.display = "block";
+		});
 
 		setInterval(function(){
 			previousMessage = `${direction.innerHTML}`;
 			direction.innerHTML = Joy.GetDir();
-			if (previousMessage != direction.innerHTML) {
+			if ((previousMessage != direction.innerHTML) && connectionStatus) {
 				ws.send(direction.innerHTML);
 			}}, 100);
 		</script>
