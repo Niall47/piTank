@@ -67,31 +67,46 @@
 		};
 
 		function shutdown(){
-			ws.send("X");
+			if (connectionStatus == true) {
+				ws.send("X");
+			}
 		}
 
 		function restart(){
-			ws.send("R");
+			if (connectionStatus == true) {
+				ws.send("R");
+			}
 		}
 
 		function customConnect(){
 			connectionStatus = true;
 			console.log(`Trying to connect to ${customInput.value}`)
 			const ws = new WebSocket(`ws://${customInput.value}:8080`);
+			updateDisplay();
+		}
+
+		function updateDisplay()
+		{
+			if ( connectionStatus == true ) {
+			customInput.setAttribute('type', 'hidden');
+			connectButton.style.display = "hidden";
 			shutdownButton.style.display = "block";
 			restartButton.style.display = "block";
 			status.innerHTML = "Connected"
 			ws.send("C");
-
+			} else {
+			customInput.setAttribute('type', Text);
+			customInput.setAttribute('value', 'localhost');
+			connectButton.style.display = "block";
+			shutdownButton.style.display = "hidden";
+			restartButton.style.display = "hidden";
+			status.innerHTML = "Not Connected"
+			}
 		}
-
 		ws.addEventListener("open", () => {
 			connectionStatus = true;
 			console.log("We are connected");
-			status.innerHTML = "Connected"
-			ws.send("C");
-			shutdownButton.style.display = "block";
-			restartButton.style.display = "block";
+			updateDisplay();
 		});
 
 		setInterval(function(){
