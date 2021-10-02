@@ -5,12 +5,34 @@
     </head>
     <body>
         <h1> Websocket demo</h1>
+        <button id="Forward">Forward</button>
+        <button id="Back">Back</button>
+        <button id="Left">Left</button>
+        <button id="Right">Right</button>
+
         <script>
             const ws = new WebSocket("ws://localhost:8080");
             ws.addEventListener("open", () => {
                 console.log("We are connected");
                 ws.send("Hello world");
-            })
+            });
+            var forward = document.getElementById('Forward');
+            var back = document.getElementById('Back');
+            var left = document.getElementById('Left');
+            var right = document.getElementById('Right');
+            forward.onclick = function() {
+                ws.send("Forward")
+            }
+            back.onclick = function() {
+                ws.send("Back")
+            }
+            left.onclick = function() {
+                ws.send("Left")
+            }
+            right.onclick = function() {
+                ws.send("Right")
+            }
         </script>
+
     </body>
 </html>
