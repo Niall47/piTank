@@ -31,9 +31,11 @@
 		<script src="joy.js"></script>
 	</head>
 	<body>
-		
+
 		<div id="joyDiv" style="width:200px;height:200px;margin:50px;position:fixed;top:30px;left:500px;"></div>
 		<div style="position:fixed;top:125px;left:750px;">
+			<input id="customInput" type="hidden"/>
+			<button id="customConnect" hidden> Connect </button>
 			<h3 id="status" type="text" >Not Connected</h3>
 			<h3 id="direction" type="text" >C</h3>
 		</div>
@@ -41,8 +43,20 @@
 		<script type="text/javascript">
 		const status = document.getElementById("status");
 		const direction = document.getElementById("direction");
+		const customInput = document.getElementById("customInput");
+		const connectButton = document.getElementById("connectButton");
 
+		
 		const ws = new WebSocket("ws://localhost:8080");
+		ws.onerror = SocketError;
+
+		function SocketError(ev) {
+			console.log("Failed to connect")
+			customInput.setAttribute('type', Text);
+			customConnect.style.display = "block";
+		}
+
+
 		ws.addEventListener("open", () => {
 			console.log("We are connected");
 			status.innerHTML = "Connected"
