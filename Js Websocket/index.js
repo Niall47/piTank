@@ -54,6 +54,7 @@ wss.on("connection", ws => {
                 break;
             case 'NW':
                 console.log('Forward/Left');
+                forwardLeft();
                 break;
             case 'X':
                 console.log('Shutdown');
@@ -99,14 +100,16 @@ function forwardRight() {
 function right() {
     DC4.writeSync(1);
     DC17.writeSync(0);
-    DC27.writeSync(1);
+    DC27.writeSync(0);
     DC22.writeSync(0);
 };
 
 function backwardRight() {
-
+    DC4.writeSync(1);
+    DC17.writeSync(0);
+    DC27.writeSync(0);
+    DC22.writeSync(0);
 };
-
 
 function backward() {
     DC4.writeSync(1);
@@ -115,25 +118,29 @@ function backward() {
     DC22.writeSync(0);
 };
 
-
 function backwardLeft() {
-
+    DC4.writeSync(0);
+    DC17.writeSync(0);
+    DC27.writeSync(1);
+    DC22.writeSync(1);
 };
 
 function left() {
+    DC4.writeSync(0);
+    DC17.writeSync(0);
+    DC27.writeSync(1);
+    DC22.writeSync(1);
+};
+
+function forwardLeft() {
     DC4.writeSync(1);
     DC17.writeSync(1);
     DC27.writeSync(1);
     DC22.writeSync(1);
 };
 
-function forwardLeft() {
-
-};
-
-
+// DC22 & DC27 Right Forward?
 // DC4 left Forward
 // DC17 Nothing?
 // DC27 Right backward
-// DC22 & DC27 Right Forward?
 // DC4 & DC17 Left backward
