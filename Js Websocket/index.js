@@ -1,10 +1,9 @@
 var sys = require('sys');
 var exec = require('child_process').exec;
 var Gpio = require('onoff').Gpio;
-var LED16 = new Gpio(16, 'out');
+var LED = new Gpio(16, 'out');
 const WebSocket = require("ws");
 const wss = new WebSocket.Server({ port: 8081 });
-
 
 // Create shutdown function
 function shellCommand(command="", callback){
@@ -13,7 +12,7 @@ function shellCommand(command="", callback){
 
 wss.on("connection", ws => {
     console.log("New client connected");
-    LED16.writeSync(1);
+    LED.writeSync(1);
 
     ws.on("message", data => {
         let input = `${data}`;
@@ -60,7 +59,7 @@ wss.on("connection", ws => {
 
     ws.on("close", () => {
         console.log("Client has disconnected");
-        LED16.writeSync(1);
+        LED.writeSync(1);
     });
 
 });
