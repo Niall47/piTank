@@ -2,10 +2,10 @@ var sys = require('sys');
 var exec = require('child_process').exec;
 var Gpio = require('onoff').Gpio;
 var LED = new Gpio(23, 'out'),
-DC4 = new Gpio(4, 'out'),
-DC17 = new Gpio(17, 'out'),
-DC27 = new Gpio(27, 'out'),
-DC22 = new Gpio(22, 'out');
+    DC4 = new Gpio(4, 'out'),
+    DC17 = new Gpio(17, 'out'),
+    DC27 = new Gpio(27, 'out'),
+    DC22 = new Gpio(22, 'out');
 const WebSocket = require("ws");
 const wss = new WebSocket.Server({ port: 8081 });
 
@@ -50,6 +50,7 @@ wss.on("connection", ws => {
                 break;
             case 'W':
                 console.log('Left');
+                left();
                 break;
             case 'NW':
                 console.log('Forward/Left');
@@ -88,6 +89,25 @@ function forward() {
     DC22.writeSync(1);
 };
 
+function forwardRight() {
+    DC4.writeSync(1);
+    DC17.writeSync(0);
+    DC27.writeSync(0);
+    DC22.writeSync(0);
+};
+
+function right() {
+    DC4.writeSync(1);
+    DC17.writeSync(0);
+    DC27.writeSync(1);
+    DC22.writeSync(0);
+};
+
+function backwardRight() {
+
+};
+
+
 function backward() {
     DC4.writeSync(1);
     DC17.writeSync(1);
@@ -95,19 +115,22 @@ function backward() {
     DC22.writeSync(0);
 };
 
-function forwardRight() {
-    DC4.writeSync(1);
-    DC17.writeSync(0);
-    DC27.writeSync(0);
-    DC22.writeSync(0);
-}
 
-function right() {
+function backwardLeft() {
+
+};
+
+function left() {
     DC4.writeSync(1);
-    DC17.writeSync(0);
-    DC27.writeSync(27);
-    DC22.writeSync(0);
-}
+    DC17.writeSync(1);
+    DC27.writeSync(1);
+    DC22.writeSync(1);
+};
+
+function forwardLeft() {
+
+};
+
 
 // DC4 left Forward
 // DC17 Nothing?
