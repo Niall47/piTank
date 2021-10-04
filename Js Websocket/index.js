@@ -41,6 +41,7 @@ wss.on("connection", ws => {
                 break;
             case 'S':
                 console.log('Backward');
+                backward();
                 break;
             case 'SW':
                 console.log('Backward/Left');
@@ -77,9 +78,25 @@ function idle (){
     DC22.writeSync(0);
     DC27.writeSync(0);
 }
+
 function forward() {
     DC4.writeSync(1);
-    DC17.writeSync(1);
-    DC27.writeSync(0);
+    DC17.writeSync(0);
+    DC27.writeSync(1);
     DC22.writeSync(1);
 };
+
+function backward() {
+    DC4.writeSync(1);
+    DC17.writeSync(1);
+    DC27.writeSync(1);
+    DC22.writeSync(0);
+};
+
+
+
+// DC4 left Forward
+// DC17 Nothing?
+// DC27 Right backward
+// DC22 & DC27 Right Forward?
+// DC4 & DC17 Left backward

@@ -34,7 +34,7 @@
 
 		<div id="joyDiv" style="width:200px;height:200px;margin:50px;position:fixed;top:30px;left:100px;"></div>
 		<div style="position:fixed;top:125px;left:10px;">
-			<input id="customInput" type="hidden"/>
+			<input id="customInput" type="hidden" value="192.168.0"/>
 			<button id="connectButton" onClick="customConnect()" hidden> Connect </button>
 			<h3 id="status" type="text" >Not Connected</h3>
 			<h3 id="direction" type="text" >C</h3>
@@ -96,7 +96,7 @@
 				ws.send("C");
 			} else {
 				customInput.setAttribute('type', Text);
-				customInput.setAttribute('value', 'localhost');
+				// customInput.setAttribute('value', 'localhost');
 				connectButton.style.display = "block";
 				shutdownButton.style.display = "none";
 				restartButton.style.display = "none";
