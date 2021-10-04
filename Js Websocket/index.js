@@ -1,7 +1,7 @@
 var sys = require('sys');
 var exec = require('child_process').exec;
 var Gpio = require('onoff').Gpio;
-var LED = new Gpio(16, 'out');
+var LED = new Gpio(23, 'out');
 const WebSocket = require("ws");
 const wss = new WebSocket.Server({ port: 8081 });
 
