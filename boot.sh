@@ -1,4 +1,5 @@
 #!/bin/bash
-/usr/bin/python /home/pi/dev/piTank.script.py
 
-
+git pull
+sudo cp index.html /var/www/html/index.html
+node index.js
