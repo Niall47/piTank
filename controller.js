@@ -11,6 +11,7 @@ const wss = new WebSocket.Server({ port: 8081 });
 
 // Create shutdown function
 function shellCommand(command="", callback){
+    LED.writeSync(0); 
     exec(command, function(error, stdout, stderr){ callback(stdout); });
 }
 
