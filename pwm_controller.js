@@ -4,7 +4,7 @@ const left_pos = new Gpio(13, {mode: Gpio.OUTPUT});
 const left_neg = new Gpio(19, {mode: Gpio.OUTPUT});
 const right_pos = new Gpio(18, {mode: Gpio.OUTPUT});
 const right_neg = new Gpio(12, {mode: Gpio.OUTPUT});
-let interval = 1000;
+let interval = 3000;
 
 (async function(){
   console.log("left pos - 13")
@@ -21,7 +21,7 @@ let interval = 1000;
   await timer(interval);
   right_pos.pwmWrite(0)
   console.log("right neg - 12")
-  right_neg.pwmWrite(255)
+  right_neg.pwmWrite(255) 
   await timer(interval);
   right_neg.pwmWrite(0)
   console.log("done")
