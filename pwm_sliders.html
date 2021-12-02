@@ -1,55 +1,98 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-.slidecontainer {
-  width: 100%;
-}
-
-.slider {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 25px;
-  background: #d3d3d3;
-  outline: none;
-  opacity: 0.7;
-  -webkit-transition: .2s;
-  transition: opacity .2s;
-}
-
-.slider:hover {
-  opacity: 1;
-}
-
-.slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 25px;
-  height: 25px;
-  background: #04AA6D;
-  cursor: pointer;
-}
-
-.slider::-moz-range-thumb {
-  width: 25px;
-  height: 25px;
-  background: #04AA6D;
-  cursor: pointer;
-}
-</style>
-</head>
-<body>
-
-<h1>Custom Range Slider</h1>
-
-<div class="slidecontainer">
-  <p>Default range slider:</p>
-  <input type="range" min="1" max="100" value="50">
   
-  <p>Custom range slider:</p>
-  <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+.rangeslider{
+    width: 50%;
+}
+  
+.myslider {
+    -webkit-appearance: none;
+    background: #FCF3CF  ;
+    width: 50%;
+    height: 20px;
+    opacity: 2;
+   }
+  
+  
+.myslider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    cursor: pointer;
+    background: #34495E  ;
+    width: 5%;
+    height: 20px;
+}
+  
+  
+.myslider:hover {
+    opacity: 1;
+}
+  
+</style>
+<body>
+  
+<h1>Power sliders for GPIO PWM pins</h1>
+
+  
+<div class="rangeslider">
+  <input type="range" min="0" max="255" value="0"
+                  class="myslider" id="sliderPin13">
+  <p>Pin13 Value: <span id="gpio13value"></span></p>
 </div>
 
+<div class="rangeslider">
+  <input type="range" min="0" max="255" value="0"
+                  class="myslider" id="sliderPin19">
+  <p>Pin19 Value: <span id="gpio19value"></span></p>
+</div>
+  
+
+<div class="rangeslider">
+  <input type="range" min="0" max="255" value="0"
+                  class="myslider" id="sliderPin18">
+  <p>Pin18 Value: <span id="gpio18value"></span></p>
+</div>
+  
+
+<div class="rangeslider">
+  <input type="range" min="0" max="255" value="0"
+                  class="myslider" id="sliderPin12">
+  <p>Pin12 Value: <span id="gpio12value"></span></p>
+</div>
+  
+
+
+<script>
+var sliderPin13 = document.getElementById("sliderPin13");
+var sliderPin19 = document.getElementById("sliderPin19");
+var sliderPin18 = document.getElementById("sliderPin18");
+var sliderPin12 = document.getElementById("sliderPin12");
+
+var pin13 = document.getElementById("gpio13value");
+var pin19 = document.getElementById("gpio19value");
+var pin18 = document.getElementById("gpio18value");
+var pin12 = document.getElementById("gpio12value");
+
+pin13.innerHTML = sliderPin13.value;
+pin19.innerHTML = sliderPin19.value;
+pin18.innerHTML = sliderPin18.value;
+pin12.innerHTML = sliderPin12.value;
+  
+sliderPin13.oninput = function() {
+  pin13.innerHTML = this.value;
+}
+
+sliderPin19.oninput = function() {
+  pin19.innerHTML = this.value;
+}
+sliderPin18.oninput = function() {
+  pin18.innerHTML = this.value;
+}
+sliderPin12.oninput = function() {
+  pin12.innerHTML = this.value;
+}
+
+</script>
+  
 </body>
 </html>
