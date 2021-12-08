@@ -39,32 +39,31 @@
 
   
 <div class="rangeslider">
-  <input type="range" min="0" max="255" value="0"
-                  class="myslider" id="sliderPin13">
-  <p>Pin13 Value: <span id="gpio13value"></span></p>
+  <input type="range" min="0" max="255" value="0" class="myslider" id="sliderPin13">
+  <p>Pin13 Value: <span id="gpio13value"></span></p><br>
+  <br>
 </div>
 
+
 <div class="rangeslider">
-  <input type="range" min="0" max="255" value="0"
-                  class="myslider" id="sliderPin19">
-  <p>Pin19 Value: <span id="gpio19value"></span></p>
+  <input type="range" min="0" max="255" value="0" class="myslider" id="sliderPin19">
+  <p>Pin19 Value: <span id="gpio19value"></span></p><br>
+  <br>
 </div>
   
 
 <div class="rangeslider">
-  <input type="range" min="0" max="255" value="0"
-                  class="myslider" id="sliderPin18">
-  <p>Pin18 Value: <span id="gpio18value"></span></p>
+  <input type="range" min="0" max="255" value="0" class="myslider" id="sliderPin18">
+  <p>Pin18 Value: <span id="gpio18value"></span></p><br>
+  <br>
 </div>
   
 
 <div class="rangeslider">
-  <input type="range" min="0" max="255" value="0"
-                  class="myslider" id="sliderPin12">
-  <p>Pin12 Value: <span id="gpio12value"></span></p>
+  <input type="range" min="0" max="255" value="0" class="myslider" id="sliderPin12">
+  <p>Pin12 Value: <span id="gpio12value"></span></p><br>
+  <br>
 </div>
-  
-
 
 <script>
 
@@ -73,12 +72,21 @@ function connect(){
 			console.log(`Trying to connect to ${ip}`)
 			ws = new WebSocket(`ws://${ip}:8081`);
 			ws.addEventListener("open", () => {
-				connectionStatus = true;
 				console.log("We are connected");
+        sliderPin13.style.background = "#00FF00";
+        sliderPin19.style.background = "#00FF00";
+        sliderPin18.style.background = "#00FF00";
+        sliderPin12.style.background = "#00FF00";
+
 			});
 			ws.addEventListener("close", () => {
-				connectionStatus = false;
 				console.log("We were disconnected");
+        sliderPin13.style.background = "#FF0000";
+        sliderPin19.style.background = "#FF0000";
+        sliderPin18.style.background = "#FF0000";
+        sliderPin12.style.background = "#FF0000";
+
+
 			});
 		};
 
