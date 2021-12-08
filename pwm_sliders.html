@@ -32,6 +32,10 @@
 <body>
   
 <h1>Power sliders for GPIO PWM pins</h1>
+<br>
+<br>
+<p></p><input id="customInput" value="localhost"/>
+<button id="connectButton" onClick="connect()"  > Connect </button></p>
 
   
 <div class="rangeslider">
@@ -63,6 +67,21 @@
 
 
 <script>
+
+function connect(){
+      let ip = customInput.value;
+			console.log(`Trying to connect to ${ip}`)
+			ws = new WebSocket(`ws://${ip}:8081`);
+			ws.addEventListener("open", () => {
+				connectionStatus = true;
+				console.log("We are connected");
+			});
+			ws.addEventListener("close", () => {
+				connectionStatus = false;
+				console.log("We were disconnected");
+			});
+		};
+
 var sliderPin13 = document.getElementById("sliderPin13");
 var sliderPin19 = document.getElementById("sliderPin19");
 var sliderPin18 = document.getElementById("sliderPin18");
@@ -81,7 +100,6 @@ pin12.innerHTML = sliderPin12.value;
 sliderPin13.oninput = function() {
   pin13.innerHTML = this.value;
 }
-
 sliderPin19.oninput = function() {
   pin19.innerHTML = this.value;
 }
@@ -90,6 +108,30 @@ sliderPin18.oninput = function() {
 }
 sliderPin12.oninput = function() {
   pin12.innerHTML = this.value;
+}
+sliderPin13.onmouseup = function() {
+  var message = new Object();
+  message.pin = "13";
+  message.value = sliderPin13.value;
+  ws.send(JSON.stringify(message));
+  }
+sliderPin19.onmouseup = function() {
+  var message = new Object();
+  message.pin = "19";
+  message.value = sliderPin19.value;
+  ws.send(JSON.stringify(message));
+}
+sliderPin18.onmouseup = function() {
+  var message = new Object();
+  message.pin = "18";
+  message.value = sliderPin18.value;
+  ws.send(JSON.stringify(message));
+}
+sliderPin12.onmouseup = function() {
+  var message = new Object();
+  message.pin = "12";
+  message.value = sliderPin12.value;
+  ws.send(JSON.stringify(message));
 }
 
 </script>
