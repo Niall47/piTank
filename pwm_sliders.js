@@ -11,7 +11,7 @@ wss.on("connection", ws => {
 
     ws.on("message", data => {
         let input = JSON.parse(data);
-        console.log(input.pin)
+        console.log(input)
         switch( parseInt(input.pin )) {
             case 13:
                 pin13gpio.pwmWrite(input.value);
