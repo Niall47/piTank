@@ -33,6 +33,10 @@ wss.on("connection", ws => {
 
     ws.on("close", () => {
         console.log("Client has disconnected");
+        pin13gpio.pwmWrite(0);
+        pin19gpio.pwmWrite(0);
+        pin18gpio.pwmWrite(0);
+        pin12gpio.pwmWrite(0);
     });
 
 });
