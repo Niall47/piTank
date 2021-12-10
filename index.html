@@ -108,76 +108,44 @@
 
 		</div>
 
-		<script type="text/javascript">
-		const status = document.getElementById("status");
-		const direction = document.getElementById("direction");
-		const customInput = document.getElementById("customInput");
-		const connectButton = document.getElementById("connectButton");
-		const restartButton = document.getElementById("restartButton");
-		const shutdownButton = document.getElementById("shutdownButton");
-		let connectionStatus = false;
-		var previousMessage = "";
-		var joyParam = { "title": "joystick" }; 		// internalFillColor internalStrokeColor externalStrokeColor
-		var Joy = new JoyStick('joyDiv', joyParam);
+		<script >
+			const status = document.getElementById("status"),
+			direction = document.getElementById("direction"),
+			customInput = document.getElementById("customInput"),
+			connectButton = document.getElementById("connectButton"),
+			restartButton = document.getElementById("restartButton"),
+			shutdownButton = document.getElementById("shutdownButton");
+			let connectionStatus = false;
+			var previousMessage = "",
+			joyParam = { title: "joystick" },
+			Joy = new JoyStick("joyDiv", joyParam);
 
-
-		function shutdown(){
-			if (connectionStatus == true) {
-				ws.send("X");
+			function shutdown() {
+				1 == connectionStatus && ws.send("X")
 			}
-		};
 
-		function restart(){
-			if (connectionStatus == true) {
-				ws.send("R");
+			function restart() {
+				1 == connectionStatus && ws.send("R")
 			}
-		};
 
-		function connect(ip){
-			console.log(`Trying to connect to ${ip}`)
-			ws = new WebSocket(`ws://${ip}:8081`);
-			ws.addEventListener("open", () => {
-				connectionStatus = true;
-				console.log("We are connected");
-				updateDisplay();
-			});
-			ws.addEventListener("close", () => {
-				connectionStatus = false;
-				console.log("We were disconnected");
-				updateDisplay();
-			});
-		};
-
-		function customConnect() {
-			connect(customInput.value)
-		};
-		function updateDisplay()
-		{
-			if ( connectionStatus == true ) {
-				customInput.setAttribute('type', 'hidden');
-				connectButton.style.display = "none";
-				shutdownButton.style.display = "block";
-				restartButton.style.display = "block";
-				status.innerHTML = "Connected"
-				ws.send("C");
-			} else {
-				customInput.setAttribute('type', Text);
-				// customInput.setAttribute('value', 'localhost');
-				connectButton.style.display = "block";
-				shutdownButton.style.display = "none";
-				restartButton.style.display = "none";
-				status.innerHTML = "Not Connected"
+			function connect(t) {
+				console.log("Trying to connect to ${ip}"), ws = new WebSocket("ws://${ip}:8081"), ws.addEventListener("open", () => {
+					connectionStatus = !0, console.log("We are connected"), updateDisplay()
+				}), ws.addEventListener("close", () => {
+					connectionStatus = !1, console.log("We were disconnected"), updateDisplay()
+				})
 			}
-		};
 
-		setInterval(function(){
-			previousMessage = `${direction.innerHTML}`;
-			direction.innerHTML = Joy.GetDir();
-			if ((previousMessage != direction.innerHTML) && connectionStatus == true) {
-				ws.send(direction.innerHTML);
-			}}, 100);
-			connect('localhost');
-			updateDisplay();
+			function customConnect() {
+				connect(customInput.value)
+			}
+
+			function updateDisplay() {
+				1 == connectionStatus ? (customInput.setAttribute("type", "hidden"), connectButton.style.display = "none", shutdownButton.style.display = "block", restartButton.style.display = "block", status.innerHTML = "Connected", ws.send("C")) : (customInput.setAttribute("type", Text), connectButton.style.display = "block", shutdownButton.style.display = "none", restartButton.style.display = "none", status.innerHTML = "Not Connected")
+			}
+			setInterval(function() {
+				previousMessage = "${direction.innerHTML}", direction.innerHTML = Joy.GetDir(), console.log("X " + Joy.GetX()), console.log("Y " + Joy.GetY()), previousMessage != direction.innerHTML && 1 == connectionStatus && ws.send(direction.innerHTML)
+			}, 100), connect("localhost"), updateDisplay();
 		</script>
 	</body>
 </html>
