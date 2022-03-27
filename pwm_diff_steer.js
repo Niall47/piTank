@@ -13,6 +13,8 @@ wss.on("connection", ws => {
     ws.on("message", data => {
         let input = `${data}`;
         console.log(JSON.parse(input))
+        left_pos.pwmWrite(input.X);
+        right_pos.pwmWrite(input.Y);
     });
 
     ws.on("close", () => {
