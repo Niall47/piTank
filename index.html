@@ -144,8 +144,14 @@
 				1 == connectionStatus ? (customInput.setAttribute("type", "hidden"), connectButton.style.display = "none", shutdownButton.style.display = "block", restartButton.style.display = "block", status.innerHTML = "Connected", ws.send("C")) : (customInput.setAttribute("type", Text), connectButton.style.display = "block", shutdownButton.style.display = "none", restartButton.style.display = "none", status.innerHTML = "Not Connected")
 			}
 			setInterval(function() {
-				previousMessage = "${direction.innerHTML}", direction.innerHTML = Joy.GetDir(), console.log("X " + Joy.GetX()), console.log("Y " + Joy.GetY()), previousMessage != direction.innerHTML && 1 == connectionStatus && ws.send(direction.innerHTML)
-			}, 100), connect("localhost"), updateDisplay();
+				payload = {
+					X: Joy.GetX() / 100,
+					Y: Joy.GetY() / 100
+				};
+				direction.innerHTML = Joy.GetDir(), 
+				1 == connectionStatus && ws.send(payload);
+			}, 100), 
+			connect("localhost"), updateDisplay();
 		</script>
 	</body>
 </html>
