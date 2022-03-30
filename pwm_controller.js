@@ -7,15 +7,6 @@ const right_neg = new Gpio(12, {mode: Gpio.OUTPUT});
 let interval = 3000;
 
 (async function(){
-  console.log("left pos - 13")
-  left_pos.pwmWrite(255)
-  await timer(interval);
-  left_pos.pwmWrite(0)
-  console.log("left neg - 19")
-  left_neg.pwmWrite(255)
-  await timer(interval);
-  left_neg.pwmWrite(0)
-
   console.log("right pos - 18")
   right_pos.pwmWrite(255)
   await timer(interval);
@@ -24,6 +15,15 @@ let interval = 3000;
   right_neg.pwmWrite(255) 
   await timer(interval);
   right_neg.pwmWrite(0)
+
+  console.log("left pos - 13")
+  left_pos.pwmWrite(255)
+  await timer(interval);
+  left_pos.pwmWrite(0)
+  console.log("left neg - 19")
+  left_neg.pwmWrite(255)
+  await timer(interval);
+  left_neg.pwmWrite(0)
   console.log("done")
 })()
 
