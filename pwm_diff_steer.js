@@ -13,8 +13,8 @@ wss.on("connection", ws => {
 
     ws.on("message", data => {
         let input = `${data}`;
-        console.log(JSON.parse(input));
-        power = diffSteer(parseInt(input.X), parseInt(input.Y));
+        cleanInput = JSON.parse(input);
+        power = diffSteer(parseInt(cleanInput.X), parseInt(cleanInput.Y));
         console.log(power);
         // if (parseInt(power[0]) < 0) {
         //     left_pos.pwmWrite(power[0] * -1);
