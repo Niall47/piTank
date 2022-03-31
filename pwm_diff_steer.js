@@ -15,7 +15,15 @@ wss.on("connection", ws => {
         let input = `${data}`;
         cleanInput = JSON.parse(input);
         power = diffSteer(parseInt(cleanInput.X), parseInt(cleanInput.Y));
+        console.log('-----------------------');
         console.log(power);
+        console.log('-----------------------');
+        console.log(cleanInput);
+        console.log('-----------------------');
+        console.log(power);
+        console.log('-----------------------');
+        console.log(diffSteer(1,0));
+        console.log('-----------------------');
         // if (parseInt(power[0]) < 0) {
         //     left_pos.pwmWrite(power[0] * -1);
         //     left_neg.pwmWrite(power[0] * -1);
