@@ -1,157 +1,102 @@
-<!DOCTYPE HTML>
-<!--
- The MIT License (MIT)
-
- This file is part of the JoyStick Project (https://github.com/bobboteck/JoyStick).
- Copyright (c) 2015 Roberto D'Amico (Bobboteck).
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
- 
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- SOFTWARE.
--->
-<html>
-	<head>
-		<title>Joystick</title>
-		<meta charset="utf-8">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PiTank</title>
 		<meta name="description" content="JoyStick">
 		<script src="joy.js"></script>
-	</head>
-	<body>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<style>
-			html,
-			body {
-			overflow-x: hidden;
-			height: 100%;
-			}
+    <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
-			body {
-			position: relative;
-			}
-			.center {
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				align-items: center;
-				height: 300px;
-				width: 300px;
-			}
-			button {
-				background-color: #7b38d8;
-				border-radius: 10px;
-				border: 4px double #cccccc;
-				color: #eeeeee;
-				text-align: center;
-				font-size: 28px;
-				padding: 20px;
-				width: 200px;
-				transition: all 0.5s;
-				cursor: pointer;
-				margin: 5px;
-	      	}
-			button span {
-				cursor: pointer;
-				display: inline-block;
-				position: relative;
-				transition: 0.5s;
-			}
-			button span:after {
-				content: '\00bb';
-				position: absolute;
-				opacity: 0;
-				top: 0;
-				right: -20px;
-				transition: 0.5s;
-			}
-			button:hover {
-				background-color: #f7c2f9;
-			}
-			button:hover span {
-				padding-right: 25px;
-			}
-			button:hover span:after {
-				opacity: 1;
-				right: 0;
-			}
+    <style>
 
-			h3 {
-				text-align: center;
-				text-transform: uppercase;
-				color: #4CAF50;
-			}
-		</style>
+    </style>
 
-		<div id="joyDiv" class="center" >
-		</div>
+    
+    <!-- Custom styles for this template -->
+    <link href="style.css" rel="stylesheet">
+  </head>
+  <body class="text-center">
+    <main class="form-signin">
+      <form>
+        <div id="connectionBlock">
+          <h1 class="h3 mb-3 fw-normal">Connect to tank</h1>
+          <div class="form-floating">
+            <input type="email" class="form-control" id="customIP" placeholder="localhost">
+            <label for="floatingInput">IP</label>
+          </div>
+          <div class="form-floating">
+            <input type="text" class="form-control" id="customPort" placeholder="8081">
+            <label for="floatingPassword">Port</label>
+          </div>
+          <label id="refreshRateText" for="customRange1" class="form-label">Refresh rate</label>
+          <input onChange="rateUpdate()" type="range" class="form-range" id="refreshRate" min="20" max="1000" step="20">
+          <div class="checkbox mb-3">
+            <label>
+              <input type="checkbox" value="remember-me"> PWM (Not in use)
+            </label>
+          </div>
+          <button id="connectButton" onClick="customConnect()" class="w-100 btn btn-lg btn-primary" type="submit">Connect</button>
+        </div>
+        <br>
+        <div id="joyDiv" class="mt-5 mb-3"></div>
 
-		<div class="center" >
-			<button id="restartButton" onClick="restart()"  hidden>Restart</button> 
-			<button id="shutdownButton" onClick="shutdown()"  hidden>Shutdown</button>
-			<input id="customInput" type="hidden" value="192.168.0."/>
-			<p><button id="connectButton" onClick="customConnect()"  hidden> Connect </button></p>
-			<h3 id="status" type="text" >Not Connected</h3>
-			<h3 id="direction" type="text" >C</h3>
-
-		</div>
-
-		<script >
-			const status = document.getElementById("status"),
+        <pre id="direction"></pre>
+        <p class="mt-5 mb-3 text-muted"> WIP: Niall</p>
+      </form>
+    </main>
+    <script>
+      var joyParam = { "title": "joystick",
+                        "width": 300,
+                        "height": 300 };
+      var Joy = new JoyStick('joyDiv', joyParam);
+      var connectionStatus = false;
+      refreshRate = document.getElementById("refreshRate");
+      refreshRateText = document.getElementById("refreshRateText");
+      connectionBlock = document.getElementById("connectionBlock");
+      const status = document.getElementById("status"),
 			direction = document.getElementById("direction"),
-			customInput = document.getElementById("customInput"),
-			connectButton = document.getElementById("connectButton"),
-			restartButton = document.getElementById("restartButton"),
-			shutdownButton = document.getElementById("shutdownButton");
-			let connectionStatus = false;
-			var previousMessage = "",
-			joyParam = { title: "joystick" },
-			Joy = new JoyStick("joyDiv", joyParam);
+			customInput = document.getElementById("customIP"),
+			connectButton = document.getElementById("connectButton")
+      rateUpdate();
 
-			function shutdown() {
-				1 == connectionStatus && ws.send("X")
-			}
+      function connect(t) {
 
-			function restart() {
-				1 == connectionStatus && ws.send("R")
-			}
-
-			function connect(t) {
-				console.log("Trying to connect to ${ip}"), ws = new WebSocket("ws://${ip}:8081"), ws.addEventListener("open", () => {
+        var url = `ws://${customIP.value}:${customPort.value}`;
+				console.log(`Trying to connect to ${url}`)
+        try {
+          ws = new WebSocket(`${url}`), ws.addEventListener("open", () => {
 					connectionStatus = !0, console.log("We are connected"), updateDisplay()
-				}), ws.addEventListener("close", () => {
+				  }), ws.addEventListener("close", () => {
 					connectionStatus = !1, console.log("We were disconnected"), updateDisplay()
-				})
-			}
+				  })
+        } catch {
+          console.log("Couldn't connect to " + url)
+        }
+			};
+
+      function rateUpdate(){
+        refreshRateText.textContent = "Refresh rate (ms): " + refreshRate.value;
+      }
 
 			function customConnect() {
 				connect(customInput.value)
-			}
+			};
 
 			function updateDisplay() {
-				1 == connectionStatus ? (customInput.setAttribute("type", "hidden"), connectButton.style.display = "none", shutdownButton.style.display = "block", restartButton.style.display = "block", status.innerHTML = "Connected", ws.send("C")) : (customInput.setAttribute("type", Text), connectButton.style.display = "block", shutdownButton.style.display = "none", restartButton.style.display = "none", status.innerHTML = "Not Connected")
-			}
+				1 == connectionStatus ? connectBlock.style.visibility = 'hidden' : connectBlock.style.visibility = 'visbible'
+			};
+
 			setInterval(function() {
 				payload = {
-					X: Joy.GetX() / 100,
-					Y: Joy.GetY() / 100
+					X: Joy.GetX(),
+					Y: Joy.GetY()
 				};
-				direction.innerHTML = Joy.GetDir(), 
-				1 == connectionStatus && ws.send(payload);
-			}, 100), 
+
+				direction.innerHTML = JSON.stringify(payload), 
+				1 == connectionStatus && ws.send(JSON.stringify(payload));
+			}, parseInt(refreshRate.value)), 
 			connect("localhost"), updateDisplay();
-		</script>
-	</body>
+    </script>
+  </body>
 </html>
