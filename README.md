@@ -5,9 +5,10 @@
 curl -sL https://deb.nodesource.com/setup_10.x | sudo bash -
 sudo apt install nodejs
 npm install
-sudo node pwm_diff_steer.js
+sudo node piTank.js
 
 ## Control
 
-Open index.html on any device on the same network
-If it can't auto connect you can specify any ip using port 8081
+Open index.html on any device you want
+If it cant connect to the tank on localhost you can enter your own IP
+By default it runs on port 8081
