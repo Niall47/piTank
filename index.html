@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PiTank</title>
 	<meta name="description" content="JoyStick">
-	<script src="joy.js"></script>
-	<script src="tankInterface.js"></script>
     <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
   </head>
@@ -16,11 +14,11 @@
         <div id="connectionBlock">
           <h1 class="h3 mb-3 fw-normal">Connect to tank</h1>
           <div class="form-floating">
-            <input type="email" class="form-control" id="customIP" placeholder="localhost">
+            <input type="email" value="192.168.0.63" class="form-control" id="customIP">
             <label for="floatingInput">IP</label>
           </div>
           <div class="form-floating">
-            <input type="text" class="form-control" id="customPort" placeholder="8081">
+            <input type="text" value="8081" class="form-control" id="customPort">
             <label for="floatingPassword">Port</label>
           </div>
           <label id="refreshRateText" for="customRange1" class="form-label">Refresh rate</label>
@@ -31,13 +29,15 @@
             </label>
           </div>
           <button id="connectButton" onClick="customConnect()" class="w-100 btn btn-lg btn-primary" type="submit">Connect</button>
-        </div>
-        <br>
-        <div id="joyDiv" class="mt-5 mb-3"></div>
 
-        <pre id="direction"></pre>
+        </div>
+        <div id="joyDiv" class="mt-5 mb-3" width="300px" height="300px"></div>
+        <pre id="direction">Joystick Values</pre>
+        <pre id="driveValues">Drive Values</pre>
         <p class="mt-5 mb-3 text-muted"> WIP: Niall</p>
       </form>
     </main>
+    <script src="joy.js"></script>
+    <script src="tankInterface.js"></script>
   </body>
 </html>
