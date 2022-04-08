@@ -10,6 +10,7 @@ direction = document.getElementById("direction");
 customInput = document.getElementById("customIP");
 connectButton = document.getElementById("connectButton");
 driveValues = document.getElementById("driveValues");
+var algorithm = getSteeringAlgorithm();
 rateUpdate();
 Joy = new JoyStick('joyDiv', joyParam);
 Vis = new Visualiser('visualiserDiv', {})
@@ -57,6 +58,15 @@ function convert(x,y) {
     // right = Math.max(-100, Math.min(right, 100));
 
     return {left, right};
+};
+
+function changeSteeringAlgorithm() {
+    algorithm = getSteeringAlgorithm();
+    console.log("Changed to " + algorithm);
+};
+
+function getSteeringAlgorithm() {
+    return document.querySelector('input[name="algorithm"]:checked').id;
 };
 
 setInterval(function() {
