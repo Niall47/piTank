@@ -12,10 +12,11 @@ connectButton = document.getElementById("connectButton");
 driveValues = document.getElementById("driveValues");
 rateUpdate();
 Joy = new JoyStick('joyDiv', joyParam);
+Vis = new Visualiser('visualiserDiv', {})
 
 function connect(t) {
 
-    var url = `ws://${customIP.value}:${customPort.value}`;
+    var url = `ws://${customInput.value}:${customPort.value}`;
     console.log(`Trying to connect to ${url}`)
     try {
         ws = new WebSocket(`${url}`), ws.addEventListener("open", () => {
@@ -52,15 +53,15 @@ function convert(x,y) {
     left = left * Math.sqrt(2);
     right = right * Math.sqrt(2);
 
-    left = Math.max(-1, Math.min(left, 1));
-    right = Math.max(-1, Math.min(right, 1));
+    // left = Math.max(-100, Math.min(left, 100));
+    // right = Math.max(-100, Math.min(right, 100));
 
     return {left, right};
 };
 
 setInterval(function() {
-    joyX = Joy.GetX() / 10;
-    joyY = Joy.GetY() / 10;
+    joyX = Joy.GetX();
+    joyY = Joy.GetY();
 
     payload = {X: joyX, Y: joyY};
     // console.log(payload);

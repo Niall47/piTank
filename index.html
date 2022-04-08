@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PiTank</title>
 	<meta name="description" content="JoyStick">
-    <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="bootstrap.min.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
   </head>
   <body class="text-center">
@@ -22,7 +22,7 @@
             <label for="floatingPassword">Port</label>
           </div>
           <label id="refreshRateText" for="customRange1" class="form-label">Refresh rate</label>
-          <input onChange="rateUpdate()" type="range" class="form-range" id="refreshRate" min="20" max="1000" step="20">
+          <input onChange="rateUpdate()" type="range" class="form-range" id="refreshRate" min="20" max="1000" step="20" value="1000">
           <div class="checkbox mb-3">
             <label>
               <input type="checkbox" value="remember-me"> PWM (Not in use)
@@ -34,10 +34,13 @@
         <div id="joyDiv" class="mt-5 mb-3" width="300px" height="300px"></div>
         <pre id="direction">Joystick Values</pre>
         <pre id="driveValues">Drive Values</pre>
+        <div id="visualiserDiv" class="mt-5 mb-3" width="300px" height="300px"></div>
         <p class="mt-5 mb-3 text-muted"> WIP: Niall</p>
       </form>
     </main>
     <script src="joy.js"></script>
+    <script src="tankVisualiser.js"></script>
     <script src="tankInterface.js"></script>
+
   </body>
 </html>
