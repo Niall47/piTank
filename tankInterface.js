@@ -42,7 +42,13 @@ function updateDisplay() {
     1 == connectionStatus ? connectionBlock.style.visibility = 'hidden' : connectionBlock.style.visibility = 'visbible'
 };
 
-function convert(x,y) {
+function compass() {
+    left = "COMPASS PLACEHOLDER";
+    right = "COMPASS PLACEHOLDER"
+    return {left, right};
+};
+
+function vanilla(x,y) {
     r = Math.hypot(x,y);
     t = Math.atan2(y,x);
 
@@ -60,6 +66,12 @@ function convert(x,y) {
     return {left, right};
 };
 
+function experimental(){
+    left = "EXPERIMENTAL PLACEHOLDER";
+    right = "EXPERIMENTAL PLACEHOLDER"
+    return {left, right};
+};
+
 function changeSteeringAlgorithm() {
     algorithm = getSteeringAlgorithm();
     console.log("Changed to " + algorithm);
@@ -69,13 +81,22 @@ function getSteeringAlgorithm() {
     return document.querySelector('input[name="algorithm"]:checked').id;
 };
 
+function getMotorInputs(x,y){
+    switch (algorithm) {
+        case "compass":
+            return compass(x,y);
+        case "vanilla":
+            return vanilla(x,y);
+        case "experimental":
+            return experimental(x,y);
+    }
+};
+
 setInterval(function() {
     joyX = Joy.GetX();
     joyY = Joy.GetY();
-
     payload = {X: joyX, Y: joyY};
-    // console.log(payload);
-    driveValues.innerHTML = JSON.stringify(convert(parseInt(joyX), parseInt(joyY)));
+    driveValues.innerHTML = JSON.stringify(getMotorInputs(joyX, joyY));
     direction.innerHTML = JSON.stringify(payload), 
     1 == connectionStatus && ws.send(JSON.stringify(payload));
     }, parseInt(refreshRate.value)), 
