@@ -24,19 +24,27 @@
           <label id="refreshRateText" for="customRange1" class="form-label">Refresh rate</label>
           <input onChange="rateUpdate()" type="range" class="form-range" id="refreshRate" min="20" max="1000" step="20" value="1000">
           <div class="checkbox mb-3">
-            <label>
-              <input type="checkbox" value="remember-me"> PWM (Not in use)
+            <label class="container">Compass steering 100% throttle
+              <input type="radio" checked="checked" name="radio">
+              <span class="checkmark"></span>
+            </label>
+            <label class="container">Vanilla JS PWM
+              <input type="radio" name="radio">
+              <span class="checkmark"></span>
+            </label>
+            <label class="container">Experimental
+              <input type="radio" name="radio">
+              <span class="checkmark"></span>
             </label>
           </div>
           <button id="connectButton" onClick="customConnect()" class="w-100 btn btn-lg btn-primary" type="submit">Connect</button>
-
         </div>
         <div id="joyDiv" class="mt-5 mb-3" width="300px" height="300px"></div>
         <pre id="direction">Joystick Values</pre>
         <pre id="driveValues">Drive Values</pre>
         <div id="visualiserDiv" class="mt-5 mb-3" width="300px" height="300px"></div>
         <p class="mt-5 mb-3 text-muted"> WIP: Niall</p>
-      </form>
+    </form>
     </main>
     <script src="joy.js"></script>
     <script src="tankVisualiser.js"></script>
