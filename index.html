@@ -1,183 +1,54 @@
-<!DOCTYPE HTML>
-<!--
- The MIT License (MIT)
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PiTank</title>
+	<meta name="description" content="JoyStick">
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+  </head>
+  <body class="text-center">
+    <main class="form-signin">
+      <form>
+        <div id="connectionBlock">
+          <h1 class="h3 mb-3 fw-normal">Connect to tank</h1>
+          <div class="form-floating">
+            <input type="email" value="192.168.0.63" class="form-control" id="customIP">
+            <label for="floatingInput">IP</label>
+          </div>
+          <div class="form-floating">
+            <input type="text" value="8081" class="form-control" id="customPort">
+            <label for="floatingPassword">Port</label>
+          </div>
+          <label id="refreshRateText" for="customRange1" class="form-label">Refresh rate</label>
+          <input onChange="rateUpdate()" type="range" class="form-range" id="refreshRate" min="20" max="1000" step="20" value="1000">
+          <div class="checkbox mb-3">
+            <label class="container">Compass steering 100% throttle
+              <input type="radio" onchange="changeSteeringAlgorithm()" checked="checked" name="algorithm" id="compass">
+              <span class="checkmark"></span>
+            </label>
+            <label class="container">Vanilla JS PWM
+              <input type="radio" onchange="changeSteeringAlgorithm()" name="algorithm" id="vanilla">
+              <span class="checkmark"></span>
+            </label>
+            <label class="container">Experimental
+              <input type="radio" onchange="changeSteeringAlgorithm()" name="algorithm" id="experimental">
+              <span class="checkmark"></span>
+            </label>
+          </div>
+          <button id="connectButton" onClick="customConnect()" class="w-100 btn btn-lg btn-primary" type="submit">Connect</button>
+        </div>
+        <div id="joyDiv" class="mt-5 mb-3" width="300px" height="300px"></div>
+        <pre id="direction">Joystick Values</pre>
+        <pre id="driveValues">Drive Values</pre>
+        <div id="visualiserDiv" class="mt-5 mb-3" width="300px" height="300px"></div>
+        <p class="mt-5 mb-3 text-muted"> WIP: Niall</p>
+    </form>
+    </main>
+    <script src="joy.js"></script>
+    <script src="tankVisualiser.js"></script>
+    <script src="tankInterface.js"></script>
 
- This file is part of the JoyStick Project (https://github.com/bobboteck/JoyStick).
- Copyright (c) 2015 Roberto D'Amico (Bobboteck).
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
- 
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- SOFTWARE.
--->
-<html>
-	<head>
-		<title>Joystick</title>
-		<meta charset="utf-8">
-		<meta name="description" content="JoyStick">
-		<script src="joy.js"></script>
-	</head>
-	<body>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<style>
-			html,
-			body {
-			overflow-x: hidden;
-			height: 100%;
-			}
-
-			body {
-			position: relative;
-			}
-			.center {
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				align-items: center;
-				height: 300px;
-				width: 300px;
-			}
-			button {
-				background-color: #7b38d8;
-				border-radius: 10px;
-				border: 4px double #cccccc;
-				color: #eeeeee;
-				text-align: center;
-				font-size: 28px;
-				padding: 20px;
-				width: 200px;
-				transition: all 0.5s;
-				cursor: pointer;
-				margin: 5px;
-	      	}
-			button span {
-				cursor: pointer;
-				display: inline-block;
-				position: relative;
-				transition: 0.5s;
-			}
-			button span:after {
-				content: '\00bb';
-				position: absolute;
-				opacity: 0;
-				top: 0;
-				right: -20px;
-				transition: 0.5s;
-			}
-			button:hover {
-				background-color: #f7c2f9;
-			}
-			button:hover span {
-				padding-right: 25px;
-			}
-			button:hover span:after {
-				opacity: 1;
-				right: 0;
-			}
-
-			h3 {
-				text-align: center;
-				text-transform: uppercase;
-				color: #4CAF50;
-			}
-		</style>
-
-		<div id="joyDiv" class="center" >
-		</div>
-
-		<div class="center" >
-			<button id="restartButton" onClick="restart()"  hidden>Restart</button> 
-			<button id="shutdownButton" onClick="shutdown()"  hidden>Shutdown</button>
-			<input id="customInput" type="hidden" value="192.168.0."/>
-			<p><button id="connectButton" onClick="customConnect()"  hidden> Connect </button></p>
-			<h3 id="status" type="text" >Not Connected</h3>
-			<h3 id="direction" type="text" >C</h3>
-
-		</div>
-
-		<script type="text/javascript">
-		const status = document.getElementById("status");
-		const direction = document.getElementById("direction");
-		const customInput = document.getElementById("customInput");
-		const connectButton = document.getElementById("connectButton");
-		const restartButton = document.getElementById("restartButton");
-		const shutdownButton = document.getElementById("shutdownButton");
-		let connectionStatus = false;
-		var previousMessage = "";
-		var joyParam = { "title": "joystick" }; 		// internalFillColor internalStrokeColor externalStrokeColor
-		var Joy = new JoyStick('joyDiv', joyParam);
-
-
-		function shutdown(){
-			if (connectionStatus == true) {
-				ws.send("X");
-			}
-		};
-
-		function restart(){
-			if (connectionStatus == true) {
-				ws.send("R");
-			}
-		};
-
-		function connect(ip){
-			console.log(`Trying to connect to ${ip}`)
-			ws = new WebSocket(`ws://${ip}:8081`);
-			ws.addEventListener("open", () => {
-				connectionStatus = true;
-				console.log("We are connected");
-				updateDisplay();
-			});
-			ws.addEventListener("close", () => {
-				connectionStatus = false;
-				console.log("We were disconnected");
-				updateDisplay();
-			});
-		};
-
-		function customConnect() {
-			connect(customInput.value)
-		};
-		function updateDisplay()
-		{
-			if ( connectionStatus == true ) {
-				customInput.setAttribute('type', 'hidden');
-				connectButton.style.display = "none";
-				shutdownButton.style.display = "block";
-				restartButton.style.display = "block";
-				status.innerHTML = "Connected"
-				ws.send("C");
-			} else {
-				customInput.setAttribute('type', Text);
-				// customInput.setAttribute('value', 'localhost');
-				connectButton.style.display = "block";
-				shutdownButton.style.display = "none";
-				restartButton.style.display = "none";
-				status.innerHTML = "Not Connected"
-			}
-		};
-
-		setInterval(function(){
-			previousMessage = `${direction.innerHTML}`;
-			direction.innerHTML = Joy.GetDir();
-			if ((previousMessage != direction.innerHTML) && connectionStatus == true) {
-				ws.send(direction.innerHTML);
-			}}, 100);
-			connect('localhost');
-			updateDisplay();
-		</script>
-	</body>
+  </body>
 </html>
