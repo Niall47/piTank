@@ -28,8 +28,8 @@
               <input type="radio" onchange="changeSteeringAlgorithm()" checked="checked" name="algorithm" id="compass">
               <span class="checkmark"></span>
             </label>
-            <label class="container">Vanilla JS PWM
-              <input type="radio" onchange="changeSteeringAlgorithm()" name="algorithm" id="vanilla">
+            <label class="container">Diff Steer
+              <input type="radio" onchange="changeSteeringAlgorithm()" name="algorithm" id="diffsteer">
               <span class="checkmark"></span>
             </label>
             <label class="container">Experimental
@@ -42,13 +42,13 @@
         <div id="joyDiv" class="mt-5 mb-3" width="300px" height="300px"></div>
         <pre id="direction">Joystick Values</pre>
         <pre id="driveValues">Drive Values</pre>
-        <div id="visualiserDiv" class="mt-5 mb-3" width="300px" height="300px"></div>
+        <!-- <div id="visualiserDiv" class="mt-5 mb-3" width="300px" height="300px"></div> -->
         <p class="mt-5 mb-3 text-muted"> WIP: Niall</p>
     </form>
     </main>
     <script src="joy.js"></script>
     <script src="tankVisualiser.js"></script>
     <script src="tankInterface.js"></script>
-
+    <script src="diffSteer.js"></script>
   </body>
 </html>
