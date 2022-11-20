@@ -5,7 +5,8 @@ var joyParam = { "title": "joystick",
 var connectionStatus = false;
 let refreshRate = document.getElementById("refreshRate");
 let refreshRateText = document.getElementById("refreshRateText");
-connectionBlock = document.getElementById("connectionBlock");
+connectedBlock = document.getElementById("connectedBlock");
+disconnectedBlock = document.getElementById("disconnectedBlock");
 const status = document.getElementById("status");
 direction = document.getElementById("direction");
 customInput = document.getElementById("customIP");
@@ -40,8 +41,21 @@ function customConnect() {
 };
 
 function updateDisplay() {
-    1 == connectionStatus ? connectionBlock.style.visibility = 'hidden' : connectionBlock.style.visibility = 'visbible'
+    console.log(connectionStatus)
+    console.log("updating display")
+    if (connectionStatus === true) {
+        connectedBlock.style.visibility = 'visible'
+        disconnectedBlock.style.visibility = 'hidden'
+    } else {
+        connectedBlock.style.visibility = 'hidden'
+        disconnectedBlock.style.visibility = 'visible'
+    }
 };
+ function disconnect() {
+    connectionStatus = false
+    ws.close()
+    updateDisplay()
+ };
 
 function clamp(num, min, max) {
     return Math.min(Math.max(num, min), max);
@@ -99,7 +113,6 @@ function diffSteer(leftRightAxis, upDownAxis) {
     return {left, right};
   }
 
-
 function experimental(x,y){
     r = Math.hypot(x,y);
     t = Math.atan2(y,x);
@@ -149,6 +162,6 @@ setInterval(function() {
     direction.innerHTML = JSON.stringify(payload);
     1 == connectionStatus && ws.send(JSON.stringify(payload));
     }, parseInt(refreshRate.value)), 
-    connect("localhost"), updateDisplay();
+     updateDisplay();
 
 

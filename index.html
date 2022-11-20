@@ -11,7 +11,7 @@
   <body class="text-center">
     <main class="form-signin">
       <form>
-        <div id="connectionBlock">
+        <div id="disconnectedBlock">
           <h1 class="h3 mb-3 fw-normal">Connect to tank</h1>
           <div class="form-floating">
             <input type="email" value="192.168.0.63" class="form-control" id="customIP">
@@ -39,6 +39,11 @@
           </div>
           <button id="connectButton" onClick="customConnect()" class="w-100 btn btn-lg btn-primary" type="submit">Connect</button>
         </div>
+
+        <div id="connectedBlock">
+          <button id="disconnectButton" onClick="disconnect()" class="w-100 btn btn-lg btn-primary" type="submit">Disconnect</button>
+        </div>
+
         <div id="joyDiv" class="mt-5 mb-3" width="300px" height="300px"></div>
         <pre id="direction">Joystick Values</pre>
         <pre id="driveValues">Drive Values</pre>
