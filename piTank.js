@@ -14,8 +14,7 @@ wss.on("connection", ws => {
     ws.on("message", data => {
         let input = `${data}`;
         cleanInput = JSON.parse(input);
-        console.log(cleanInput);
-        driveMotors(cleanInput.X, cleanInput.Y);
+       driveMotors(cleanInput.left, cleanInput.right);
     });
 
     ws.on("close", () => {
@@ -23,6 +22,6 @@ wss.on("connection", ws => {
     });
 
 });
-function driveMotors(X,Y){
-    console.log('driving motors with' + X + Y);
+function driveMotors(left,right){
+    console.log('Left: ' + left +  '   Right: ' + right);
 };
