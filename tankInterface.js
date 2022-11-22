@@ -41,8 +41,6 @@ function customConnect() {
 };
 
 function updateDisplay() {
-    console.log(connectionStatus)
-    console.log("updating display")
     if (connectionStatus === true) {
         connectedBlock.style.visibility = 'visible'
         disconnectedBlock.style.visibility = 'hidden'
@@ -51,6 +49,7 @@ function updateDisplay() {
         disconnectedBlock.style.visibility = 'visible'
     }
 };
+
  function disconnect() {
     connectionStatus = false
     ws.close()
@@ -152,16 +151,28 @@ function getMotorInputs(x,y){
     }
 };
 
-
-setInterval(function() {
-
+function getDirection() {
     joyX = Joy.GetX();
     joyY = Joy.GetY();
-    payload = {X: joyX, Y: joyY};
-    driveValues.innerHTML = JSON.stringify(getMotorInputs(joyX, joyY));
-    direction.innerHTML = JSON.stringify(payload);
-    1 == connectionStatus && ws.send(JSON.stringify(payload));
-    }, parseInt(refreshRate.value)), 
+    return {X: joyX, Y: joyY};
+};
+
+function sendPayload(payload) {
+    console.log('sending: ' + payload)
+    ws.send(payload)
+};
+
+
+setInterval(function() {
+    let directions = getDirection()
+    console.log(directions);
+    motorInputs = JSON.stringify(getMotorInputs(directions.Y, directions.Y));
+    driveValues.innerHTML = motorInputs;
+    direction.innerHTML = JSON.stringify(directions);
+        if (connectionStatus === true) {
+            console.log(getMotorInputs(directions.X, directions.Y));
+            payload = JSON.stringify(getMotorInputs(directions.X, directions.Y));
+            sendPayload(payload);   
+        }
+      }, parseInt(refreshRate.value)), 
      updateDisplay();
-
-
