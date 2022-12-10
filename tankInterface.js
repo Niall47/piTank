@@ -169,10 +169,7 @@ setInterval(function() {
     motorInputPayload = JSON.stringify(motorInputs);
     driveValues.innerHTML = motorInputPayload
     direction.innerHTML = JSON.stringify(directions);
-    // renderPower(motorInputs.left, motorInputs.right)
-    //     if (connectionStatus === true) {
-    //         console.log(motorInputPayload);
-    //         sendPayload(motorInputPayload);   
-    //     }
+    updateCanvas(motorInputs.right, 'rightTrack');
+    updateCanvas(motorInputs.left, 'leftTrack');
       }, parseInt(refreshRate.value)), 
      updateDisplay();
