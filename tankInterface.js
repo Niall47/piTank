@@ -165,14 +165,14 @@ function sendPayload(payload) {
 
 setInterval(function() {
     let directions = getDirection()
-    console.log(directions);
-    motorInputs = JSON.stringify(getMotorInputs(directions.Y, directions.Y));
-    driveValues.innerHTML = motorInputs;
+    motorInputs = getMotorInputs(directions.Y, directions.Y);
+    motorInputPayload = JSON.stringify(motorInputs);
+    driveValues.innerHTML = motorInputPayload
     direction.innerHTML = JSON.stringify(directions);
-        if (connectionStatus === true) {
-            console.log(getMotorInputs(directions.X, directions.Y));
-            payload = JSON.stringify(getMotorInputs(directions.X, directions.Y));
-            sendPayload(payload);   
-        }
+    // renderPower(motorInputs.left, motorInputs.right)
+    //     if (connectionStatus === true) {
+    //         console.log(motorInputPayload);
+    //         sendPayload(motorInputPayload);   
+    //     }
       }, parseInt(refreshRate.value)), 
      updateDisplay();
