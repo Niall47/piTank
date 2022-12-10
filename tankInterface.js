@@ -60,9 +60,22 @@ function clamp(num, min, max) {
     return Math.min(Math.max(num, min), max);
  };
 
-function compass() {
-    left = "COMPASS PLACEHOLDER";
-    right = "COMPASS PLACEHOLDER"
+function compass(x, y) {
+
+    direction = Joy.GetDir();
+    var powerValues = {
+        C: [0, 0],
+        N: [100, 100],
+        NE: [75, -75],
+        E: [100, -100],
+        SE: [-50, 50],
+        S: [-100, -100],
+        SW: [50, -50],
+        W: [-100, 100],
+        NW: [-75, 75]
+      };
+    left = powerValues[direction][0];
+    right = powerValues[direction][1];
     return {left, right};
 };
 
@@ -106,8 +119,8 @@ function diffSteer(leftRightAxis, upDownAxis) {
     leftMotorOutput = clamp(leftMotorOutput, minAxis, maxAxis);
     rightMotorOutput = (rightMotorScale + rightMotorNoThrottleTurnScale) * axisFlip;
     rightMotorOutput = clamp(rightMotorOutput, minAxis, maxAxis);
-    left = maxSpeed * leftMotorOutput;
-    right = maxSpeed * rightMotorOutput;
+    left = -(maxSpeed * leftMotorOutput);
+    right = -(maxSpeed * rightMotorOutput);
 
     return {left, right};
   }
