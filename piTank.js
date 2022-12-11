@@ -24,8 +24,8 @@ wss.on("connection", ws => {
 });
 function driveMotors(left,right){
 
-    left_inputs = calculateInput(left);
-    right_inputs = calculateInput(right);
+    left_inputs = pwm_value(left);
+    right_inputs = pwm_value(right);
     console.log(pwmValue(left) + '    '+ pwmValue(right));
     left_pos.pwmWrite(left_inputs[0]);
     left_neg.pwmWrite(left_inputs[1]);
