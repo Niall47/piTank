@@ -24,16 +24,13 @@ wss.on("connection", ws => {
 });
 function driveMotors(left,right){
 
-    console.log(pwmValue(left) + '    '+ pwmValue(right))
-    // left = calculateInput(left);
-    // right = calculateInput(right);
-
-    // left_pos.pwmWrite(left[0]);
-    // left_neg.pwmWrite(left[1]);
-    // right_pos.pw mWrite(right[0]);
-    // right_neg.pwmWrite(right[1]);
-
-    // console.log('Left: ' + pwmValue(left) +  '   Right: ' + pwmValue(right));
+    left_inputs = calculateInput(left);
+    right_inputs = calculateInput(right);
+    console.log(pwmValue(left) + '    '+ pwmValue(right));
+    left_pos.pwmWrite(left_inputs[0]);
+    left_neg.pwmWrite(left_inputs[1]);
+    right_pos.pwmWrite(right_inputs[0]);
+    right_neg.pwmWrite(right_inputs[1]);
 };
 
 function pwmValue(input){
@@ -47,7 +44,7 @@ function pwmValue(input){
 };
 
 function calculatePWM(input) {
-    Math.abs(Math.round((input/100)*255));
+    return Math.abs(Math.round((input/100)*255));
 }
 
 // function calculateInput(percentage){
