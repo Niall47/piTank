@@ -23,5 +23,24 @@ wss.on("connection", ws => {
 
 });
 function driveMotors(left,right){
+    left = calculateInput(left);
+    right = calculateInput(right);
+
+    // left_pos.pwmWrite(left[0]);
+    // left_neg.pwmWrite(left[1]);
+    // right_pos.pw mWrite(right[0]);
+    // right_neg.pwmWrite(right[1]);
+
     console.log('Left: ' + left +  '   Right: ' + right);
+};
+
+
+function calculateInput(percentage){
+    if (percentage === 0 ){
+        return [0,0]
+    } else if (percentage > 0){
+        console.log(percentage);
+    } else if (percentage < 0){
+        console.log(percentage)
+    };
 };
