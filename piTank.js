@@ -5,26 +5,7 @@ const right_pos = new Gpio(18, {mode: Gpio.OUTPUT});
 const right_neg = new Gpio(12, {mode: Gpio.OUTPUT});
 const WebSocket = require("ws");
 const wss = new WebSocket.Server({ port: 8081 });
-var diffSteer = require('diff-steer')
 
-
-function convert(x,y) {
-    r = Math.hypot(x,y);
-    t = Math.atan2(y,x);
-
-    t += Math.PI / 4;
-
-    left = r * Math.cos(t);
-    right = r * Math.sin(t);
-
-    left = left * Math.sqrt(2);
-    right = right * Math.sqrt(2);
-
-    left = Math.max(-1, Math.min(left, 1));
-    right = Math.max(-1, Math.min(right, 1));
-
-    return left, right;
-};
 
 // pigpio.initialize(); 
 wss.on("connection", ws => {
@@ -33,29 +14,7 @@ wss.on("connection", ws => {
     ws.on("message", data => {
         let input = `${data}`;
         cleanInput = JSON.parse(input);
-        power = diffSteer(parseInt(cleanInput.X), parseInt(cleanInput.Y));
-        console.log('-----------------------');
-        console.log(cleanInput);
-        console.log('-----------------------');
-        console.log(power);
-        console.log('-----------------------');
-        console.log(convert(parseInt(cleanInput.X), parseInt(cleanInput.Y))
-
-        // if (parseInt(power[0]) < 0) {
-        //     left_pos.pwmWrite(power[0] * -1);
-        //     left_neg.pwmWrite(power[0] * -1);
-        //     left_pos.pwmWrite(power[0]);
-        //     left_neg.pwmWrite(0);
-        // };
-        // if (parseInt(power[1]) <= 0) {
-        //     right_pos.pwmWrite(power[1] * -1);
-        //     right_neg.pwmWrite(power[1] * -1);
-        // } else {
-        //     right_pos.pwmWrite(power[1]);
-        //     right_neg.pwmWrite(0);
-        // };
-        // left_pos.pwmWrite(power[0]);
-        // right_pos.pwmWrite(power[1]);
+       driveMotors(cleanInput.left, cleanInput.right);
     });
 
     ws.on("close", () => {
@@ -63,12 +22,39 @@ wss.on("connection", ws => {
     });
 
 });
+function driveMotors(left,right){
 
+    left_inputs = pwmValue(left);
+    right_inputs = pwmValue(right);
+    console.log(pwmValue(left) + '    '+ pwmValue(right));
+    left_pos.pwmWrite(left_inputs[0]);
+    left_neg.pwmWrite(left_inputs[1]);
+    right_pos.pwmWrite(right_inputs[0]);
+    right_neg.pwmWrite(right_inputs[1]);
+};
 
-// process.on('SIGINT', () => {
-//     led.digitalWrite(0);
-//     pigpio.terminate(); // pigpio C library terminated here
-//     clearInterval(iv);
-//     console.log('Terminating...');
-//   });
-  
+function pwmValue(input){
+    positive = calculatePWM(input);
+    if (input >= 0){
+        negative = 0;
+    } else {
+        negative = calculatePWM(input);
+    }
+    return [positive, negative];
+};
+
+function calculatePWM(input) {
+    return Math.abs(Math.round((input/100)*255));
+}
+
+// function calculateInput(percentage){
+//     if (percentage === 0 ){
+//         return [0,0]
+//     } else if (percentage > 0){
+//         return [pwmValue(percentage), pwmValue(percentage)]
+
+//         console.log(percentage);
+//     } else if (percentage < 0){
+//         console.log(percentage)
+//     };
+// };

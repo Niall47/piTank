@@ -11,7 +11,7 @@
   <body class="text-center">
     <main class="form-signin">
       <form>
-        <div id="connectionBlock">
+        <div id="disconnectedBlock">
           <h1 class="h3 mb-3 fw-normal">Connect to tank</h1>
           <div class="form-floating">
             <input type="email" value="192.168.0.63" class="form-control" id="customIP">
@@ -22,14 +22,14 @@
             <label for="floatingPassword">Port</label>
           </div>
           <label id="refreshRateText" for="customRange1" class="form-label">Refresh rate</label>
-          <input onChange="rateUpdate()" type="range" class="form-range" id="refreshRate" min="20" max="1000" step="20" value="1000">
+          <input onChange="rateUpdate()" type="range" class="form-range" id="refreshRate" min="20" max="1000" step="20" value="200">
           <div class="checkbox mb-3">
             <label class="container">Compass steering 100% throttle
               <input type="radio" onchange="changeSteeringAlgorithm()" checked="checked" name="algorithm" id="compass">
               <span class="checkmark"></span>
             </label>
-            <label class="container">Vanilla JS PWM
-              <input type="radio" onchange="changeSteeringAlgorithm()" name="algorithm" id="vanilla">
+            <label class="container">Diff Steer
+              <input type="radio" onchange="changeSteeringAlgorithm()" name="algorithm" id="diffsteer">
               <span class="checkmark"></span>
             </label>
             <label class="container">Experimental
@@ -39,16 +39,23 @@
           </div>
           <button id="connectButton" onClick="customConnect()" class="w-100 btn btn-lg btn-primary" type="submit">Connect</button>
         </div>
+
+        <div id="connectedBlock">
+          <button id="disconnectButton" onClick="disconnect()" class="w-100 btn btn-lg btn-primary" type="submit">Disconnect</button>
+        </div>
+
+        <canvas id="leftTrack" width="100" height="400"></canvas>
+        <canvas id="rightTrack" width="100" height="400"></canvas>
+
         <div id="joyDiv" class="mt-5 mb-3" width="300px" height="300px"></div>
         <pre id="direction">Joystick Values</pre>
         <pre id="driveValues">Drive Values</pre>
-        <div id="visualiserDiv" class="mt-5 mb-3" width="300px" height="300px"></div>
+        <!-- <div id="visualiserDiv" class="mt-5 mb-3" width="300px" height="300px"></div> -->
         <p class="mt-5 mb-3 text-muted"> WIP: Niall</p>
     </form>
     </main>
     <script src="joy.js"></script>
     <script src="tankVisualiser.js"></script>
     <script src="tankInterface.js"></script>
-
   </body>
 </html>

@@ -1,10 +1,12 @@
+
 var joyParam = { "title": "joystick",
                 "width": 300,
                 "height": 300 };
 var connectionStatus = false;
 let refreshRate = document.getElementById("refreshRate");
 let refreshRateText = document.getElementById("refreshRateText");
-connectionBlock = document.getElementById("connectionBlock");
+connectedBlock = document.getElementById("connectedBlock");
+disconnectedBlock = document.getElementById("disconnectedBlock");
 const status = document.getElementById("status");
 direction = document.getElementById("direction");
 customInput = document.getElementById("customIP");
@@ -13,7 +15,7 @@ driveValues = document.getElementById("driveValues");
 var algorithm = getSteeringAlgorithm();
 rateUpdate();
 Joy = new JoyStick('joyDiv', joyParam);
-Vis = new Visualiser('visualiserDiv', {})
+// Vis = new Visualiser('visualiserDiv', {})
 
 function connect(t) {
 
@@ -39,16 +41,91 @@ function customConnect() {
 };
 
 function updateDisplay() {
-    1 == connectionStatus ? connectionBlock.style.visibility = 'hidden' : connectionBlock.style.visibility = 'visbible'
+    if (connectionStatus === true) {
+        connectedBlock.style.visibility = 'visible'
+        disconnectedBlock.style.visibility = 'hidden'
+    } else {
+        connectedBlock.style.visibility = 'hidden'
+        disconnectedBlock.style.visibility = 'visible'
+    }
 };
 
-function compass() {
-    left = "COMPASS PLACEHOLDER";
-    right = "COMPASS PLACEHOLDER"
+ function disconnect() {
+    connectionStatus = false
+    ws.close()
+    updateDisplay()
+ };
+
+function clamp(num, min, max) {
+    return Math.min(Math.max(num, min), max);
+ };
+
+function compass(x, y) {
+
+    direction = Joy.GetDir();
+    var powerValues = {
+        C: [0, 0],
+        N: [100, 100],
+        NE: [75, -75],
+        E: [100, -100],
+        SE: [-50, 50],
+        S: [-100, -100],
+        SW: [50, -50],
+        W: [-100, 100],
+        NW: [-75, 75]
+      };
+    left = powerValues[direction][0];
+    right = powerValues[direction][1];
     return {left, right};
 };
 
-function vanilla(x,y) {
+function diffSteer(leftRightAxis, upDownAxis) {
+    // console.log(leftRightAxis);
+    // console.log(upDownAxis);
+    axisFlip = -1;
+    maxAxis = 1;
+    maxSpeed = 255;
+    minAxis = -1;
+    var direction = 0;
+    var leftMotorNoThrottleScale = 0;
+    var leftMotorOutput = 0;
+    var leftMotorScale = 0;
+    var rightMotorNoThrottleTurnScale = 0;
+    var rightMotorOutput = 0;
+    var rightMotorScale = 0;
+    var throttle;
+  
+    // Adjust for the joystick being used
+    leftRightAxis = leftRightAxis / 100;
+    upDownAxis = upDownAxis / 100;
+
+
+    // Calculate Throttled Steering Motor values
+    direction = leftRightAxis / maxAxis;
+  
+    // Turn with with throttle
+    leftMotorScale = upDownAxis * (1 + direction);
+    leftMotorScale = clamp(leftMotorScale, minAxis, maxAxis); // Govern Axis to Minimum and Maximum range
+    rightMotorScale = upDownAxis * (1 - direction);
+    rightMotorScale = clamp(rightMotorScale, minAxis, maxAxis); // Govern Axis to Minimum and Maximum range
+  
+    // Calculate No Throttle Steering Motors values (Turn with little to no throttle)
+    throttle = 1 - Math.abs(upDownAxis / maxAxis); // Throttle inverse magnitude (1 = min, 0 = max)
+    leftMotorNoThrottleScale = -leftRightAxis * throttle;
+    rightMotorNoThrottleTurnScale = leftRightAxis * throttle;
+  
+    // Calculate final motor output values
+    leftMotorOutput = (leftMotorScale + leftMotorNoThrottleScale) * axisFlip;
+    leftMotorOutput = clamp(leftMotorOutput, minAxis, maxAxis);
+    rightMotorOutput = (rightMotorScale + rightMotorNoThrottleTurnScale) * axisFlip;
+    rightMotorOutput = clamp(rightMotorOutput, minAxis, maxAxis);
+    left = -(maxSpeed * leftMotorOutput);
+    right = -(maxSpeed * rightMotorOutput);
+
+    return {left, right};
+  }
+
+function experimental(x,y){
     r = Math.hypot(x,y);
     t = Math.atan2(y,x);
 
@@ -62,13 +139,8 @@ function vanilla(x,y) {
 
     // left = Math.max(-100, Math.min(left, 100));
     // right = Math.max(-100, Math.min(right, 100));
-
-    return {left, right};
-};
-
-function experimental(){
-    left = "EXPERIMENTAL PLACEHOLDER";
-    right = "EXPERIMENTAL PLACEHOLDER"
+    left = Math.round(left);
+    right = Math.round(right);
     return {left, right};
 };
 
@@ -85,21 +157,32 @@ function getMotorInputs(x,y){
     switch (algorithm) {
         case "compass":
             return compass(x,y);
-        case "vanilla":
-            return vanilla(x,y);
+        case "diffsteer":
+            return diffSteer(x,y);
         case "experimental":
             return experimental(x,y);
     }
 };
 
-setInterval(function() {
+function getDirection() {
     joyX = Joy.GetX();
     joyY = Joy.GetY();
-    payload = {X: joyX, Y: joyY};
-    driveValues.innerHTML = JSON.stringify(getMotorInputs(joyX, joyY));
-    direction.innerHTML = JSON.stringify(payload), 
-    1 == connectionStatus && ws.send(JSON.stringify(payload));
-    }, parseInt(refreshRate.value)), 
-    connect("localhost"), updateDisplay();
+    return {X: joyX, Y: joyY};
+};
+
+function sendPayload(payload) {
+    console.log('sending: ' + payload)
+    ws.send(payload)
+};
 
 
+setInterval(function() {
+    let directions = getDirection()
+    motorInputs = getMotorInputs(directions.Y, directions.Y);
+    motorInputPayload = JSON.stringify(motorInputs);
+    driveValues.innerHTML = motorInputPayload
+    direction.innerHTML = JSON.stringify(directions);
+    updateCanvas(motorInputs.right, 'rightTrack');
+    updateCanvas(motorInputs.left, 'leftTrack');
+      }, parseInt(refreshRate.value)), 
+     updateDisplay();

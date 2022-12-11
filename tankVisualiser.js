@@ -1,35 +1,23 @@
 
+function updateCanvas(value, track) {
+    var canvas = document.getElementById(track);
+    var context = canvas.getContext('2d');
 
-var Visualiser = (function(container, parameters, callback) {
-    parameters = parameters || {};
-    var title = (typeof parameters.title === "undefined" ? "Visualiser" : parameters.title),
-        width = (typeof parameters.width === "undefined" ? 0 : parameters.width),
-        height = (typeof parameters.height === "undefined" ? 0 : parameters.height)
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = 'red';
 
-    var objContainer = document.getElementById(container);
-    var canvas = document.createElement("canvas");
-    canvas.id = title;
-    if(width === 0) { width = objContainer.clientWidth; }
-    if(height === 0) { height = objContainer.clientHeight; }
-    canvas.width = width;
-    canvas.height = height;
-    objContainer.appendChild(canvas);
-    var context=canvas.getContext("2d");
+    var rectX = 0;
+    var rectY = canvas.height / 2;
+    var rectWidth = canvas.width;
+    var rectHeight = value;
 
-    drawExternal();
-
-    function drawExternal()
-    {
-        var grd = context.createLinearGradient(0,0,100,100);
-        grd.addColorStop(0, "red");
-        grd.addColorStop(1, "white");
-        context.fillStyle = grd;
-        context.fillRect(10,10,150,80);
-
-        context.stroke();
+    if (value > 0) {
+        rectHeight = -rectHeight
+    } else if (value < 0) {
+        rectHeight = -value;
+    } else {
+        // Do nothing
     }
 
-
-});
-
-// Vis = new Visualiser('visualiserDiv', {})
+    context.fillRect(rectX, rectY, rectWidth, rectHeight);
+};
