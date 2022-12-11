@@ -37,16 +37,18 @@ function driveMotors(left,right){
 };
 
 function pwmValue(input){
-    positive = Math.round((input/100)*255);
+    positive = calculatePWM(input);
     if (input >= 0){
         negative = 0;
     } else {
-        negative = Math.round((input/100)*255);
+        negative = calculatePWM(input);
     }
-    negative = Math.round((input/100)*255);
     return [positive, negative];
-}
+};
 
+function calculatePWM(input) {
+    Math.abs(Math.round((input/100)*255));
+}
 
 // function calculateInput(percentage){
 //     if (percentage === 0 ){
