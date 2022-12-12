@@ -182,6 +182,9 @@ setInterval(function() {
     motorInputPayload = JSON.stringify(motorInputs);
     driveValues.innerHTML = motorInputPayload
     direction.innerHTML = JSON.stringify(directions);
+    if (connectionStatus === true) {
+        sendPayload(motorInputPayload);
+    };
     updateCanvas(motorInputs.right, 'rightTrack');
     updateCanvas(motorInputs.left, 'leftTrack');
       }, parseInt(refreshRate.value)), 
