@@ -41,6 +41,7 @@ function driveMotors(left,right){
     left_neg.pwmWrite(left_inputs[1]);
     right_pos.pwmWrite(right_inputs[0]);
     right_neg.pwmWrite(right_inputs[1]);
+    console.log(`Left Pos: ${left_pos.digitalRead()}, Left Neg: ${left_neg.digitalRead()}, Right Pos: ${right_pos.digitalRead()}, Right Neg: ${right_neg.digitalRead()}`);
 };
 
 function pwmValue(input){
@@ -56,3 +57,11 @@ function pwmValue(input){
 function calculatePWM(input) {
     return Math.abs(Math.round((input/100)*255));
 }
+// ____   ____  ______   ____  ____   __  _ 
+// |    \ l    j|      T /    T|    \ |  l/ ]
+// |  o  ) |  T |      |Y  o  ||  _  Y|  ' / 
+// |   _/  |  | l_j  l_j|     ||  |  ||    \ 
+// |  |    |  |   |  |  |  _  ||  |  ||     Y
+// |  |    j  l   |  |  |  |  ||  |  ||  .  |
+// l__j   |____j  l__j  l__j__jl__j__jl__j\_j
+                                          
