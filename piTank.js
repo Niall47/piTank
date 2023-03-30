@@ -5,20 +5,30 @@ const right_pos = new Gpio(18, {mode: Gpio.OUTPUT});
 const right_neg = new Gpio(12, {mode: Gpio.OUTPUT});
 const WebSocket = require("ws");
 const wss = new WebSocket.Server({ port: 8081 });
+let isConnected = false;
 
-
+console.log("Waiting for connection");
 // pigpio.initialize(); 
 wss.on("connection", ws => {
+    if (isConnected) {
+        console.log("Connection refused. A client is already connected.");
+        ws.terminate();
+        return;
+    }
+
+    isConnected = true;
     console.log("New client connected");
 
     ws.on("message", data => {
         let input = `${data}`;
         cleanInput = JSON.parse(input);
-       driveMotors(cleanInput.left, cleanInput.right);
+        driveMotors(cleanInput.left, cleanInput.right);
     });
 
     ws.on("close", () => {
         console.log("Client has disconnected");
+        driveMotors(0, 0);
+        isConnected = false;
     });
 
 });
@@ -46,15 +56,3 @@ function pwmValue(input){
 function calculatePWM(input) {
     return Math.abs(Math.round((input/100)*255));
 }
-
-// function calculateInput(percentage){
-//     if (percentage === 0 ){
-//         return [0,0]
-//     } else if (percentage > 0){
-//         return [pwmValue(percentage), pwmValue(percentage)]
-
-//         console.log(percentage);
-//     } else if (percentage < 0){
-//         console.log(percentage)
-//     };
-// };
