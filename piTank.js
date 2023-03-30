@@ -8,7 +8,13 @@ const wss = new WebSocket.Server({ port: 8081 });
 let isConnected = false;
 
 console.log("Waiting for connection");
-// pigpio.initialize(); 
+
+// error handling
+left_pos.on('error', (err) => console.error('left_pos error: ', err));
+left_neg.on('error', (err) => console.error('left_neg error: ', err));
+right_pos.on('error', (err) => console.error('right_pos error: ', err));
+right_neg.on('error', (err) => console.error('right_neg error: ', err));
+
 wss.on("connection", ws => {
     if (isConnected) {
         console.log("Connection refused. A client is already connected.");
@@ -32,15 +38,21 @@ wss.on("connection", ws => {
     });
 
 });
+
 function driveMotors(left,right){
 
     left_inputs = pwmValue(left);
     right_inputs = pwmValue(right);
     console.log(pwmValue(left) + '    '+ pwmValue(right));
-    left_pos.pwmWrite(left_inputs[0]);
-    left_neg.pwmWrite(left_inputs[1]);
-    right_pos.pwmWrite(right_inputs[0]);
-    right_neg.pwmWrite(right_inputs[1]);
+    // error handling
+    try {
+        left_pos.pwmWrite(left_inputs[0]);
+        left_neg.pwmWrite(left_inputs[1]);
+        right_pos.pwmWrite(right_inputs[0]);
+        right_neg.pwmWrite(right_inputs[1]);
+    } catch (err) {
+        console.error('Error while writing to GPIO pins: ', err);
+    }
     console.log(`Left Pos: ${left_pos.digitalRead()}, Left Neg: ${left_neg.digitalRead()}, Right Pos: ${right_pos.digitalRead()}, Right Neg: ${right_neg.digitalRead()}`);
 };
 
@@ -57,11 +69,3 @@ function pwmValue(input){
 function calculatePWM(input) {
     return Math.abs(Math.round((input/100)*255));
 }
-// ____   ____  ______   ____  ____   __  _ 
-// |    \ l    j|      T /    T|    \ |  l/ ]
-// |  o  ) |  T |      |Y  o  ||  _  Y|  ' / 
-// |   _/  |  | l_j  l_j|     ||  |  ||    \ 
-// |  |    |  |   |  |  |  _  ||  |  ||     Y
-// |  |    j  l   |  |  |  |  ||  |  ||  .  |
-// l__j   |____j  l__j  l__j__jl__j__jl__j\_j
-                                          
