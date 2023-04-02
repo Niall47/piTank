@@ -95,3 +95,13 @@ function controlLED(mode) {
     led.digitalWrite(1);
   }
 }
+
+// Function to handle the interrupt signal and turn off the LED
+function handleInterrupt() {
+  clearInterval(intervalId);
+  led.digitalWrite(0);
+  process.exit();
+}
+
+// Register the interrupt signal handler
+process.on('SIGINT', handleInterrupt);
