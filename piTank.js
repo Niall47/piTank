@@ -37,7 +37,7 @@ wss.on("connection", ws => {
     });
 
     ws.on("close", () => {
-        controlLED("off");
+        controlLED("flashing");
         console.log("Client has disconnected");
         driveMotors(0, 0);
         isConnected = false;
@@ -100,6 +100,10 @@ function controlLED(mode) {
 function handleInterrupt() {
   clearInterval(intervalId);
   led.digitalWrite(0);
+  left_pos.pwmWrite(0);
+  left_neg.pwmWrite(0);
+  right_pos.pwmWrite(0);
+  right_neg.pwmWrite(0);
   process.exit();
 }
 
