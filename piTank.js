@@ -9,6 +9,7 @@ const right_neg = new Gpio(12, {mode: Gpio.OUTPUT});
 const WebSocket = require("ws");
 const wss = new WebSocket.Server({ port: 8081 });
 let isConnected = false;
+let clientTimeoutId;
 
 console.log("Waiting for connection");
 
@@ -19,31 +20,42 @@ right_pos.on('error', (err) => console.error('right_pos error: ', err));
 right_neg.on('error', (err) => console.error('right_neg error: ', err));
 
 wss.on("connection", ws => {
+  if (isConnected) {
+    console.log("Connection refused. A client is already connected.");
+    ws.terminate();
+    return;
+  }
 
-    if (isConnected) {
-        console.log("Connection refused. A client is already connected.");
-        ws.terminate();
-        return;
-    }
+  controlLED("on");
+  isConnected = true;
+  console.log("New client connected");
 
-    controlLED("on");
-    isConnected = true;
-    console.log("New client connected");
+  ws.on("message", data => {
+    let input = `${data}`;
+    cleanInput = JSON.parse(input);
+    driveMotors(cleanInput.left, cleanInput.right);
+    // Reset the timeout timer whenever a message is received
+    clearTimeout(clientTimeoutId);
+    clientTimeoutId = setTimeout(() => {
+      // The client has not sent a message for over 1 second
+      // Do something here, for example:
+      console.log("Client has timed out.");
+      // Turn off the LED if there are no more connected clients
+      controlLED("off");
+      isConnected = false;
+      driveMotors(0, 0);
+      ws.terminate();
+    }, 1000);
+  });
 
-    ws.on("message", data => {
-        let input = `${data}`;
-        cleanInput = JSON.parse(input);
-        driveMotors(cleanInput.left, cleanInput.right);
-    });
-
-    ws.on("close", () => {
-        controlLED("flashing");
-        console.log("Client has disconnected");
-        driveMotors(0, 0);
-        isConnected = false;
-    });
-
+  ws.on("close", () => {
+    console.log("Client has disconnected");
+    controlLED("off");
+    isConnected = false;
+    driveMotors(0, 0);
+  });
 });
+
 
 function driveMotors(left,right){
 
