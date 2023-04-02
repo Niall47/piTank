@@ -1,7 +1,7 @@
 const Gpio = require('pigpio').Gpio;
 let intervalId;
 const led = new Gpio(17, {mode: Gpio.OUTPUT});
-controlLED("flash");
+controlLED("flashing");
 const left_pos = new Gpio(13, {mode: Gpio.OUTPUT});
 const left_neg = new Gpio(19, {mode: Gpio.OUTPUT});
 const right_pos = new Gpio(18, {mode: Gpio.OUTPUT});
@@ -19,13 +19,14 @@ right_pos.on('error', (err) => console.error('right_pos error: ', err));
 right_neg.on('error', (err) => console.error('right_neg error: ', err));
 
 wss.on("connection", ws => {
-  controlLED("on");
+
     if (isConnected) {
         console.log("Connection refused. A client is already connected.");
         ws.terminate();
         return;
     }
 
+    controlLED("on");
     isConnected = true;
     console.log("New client connected");
 
@@ -75,18 +76,20 @@ function calculatePWM(input) {
     return Math.abs(Math.round((input/100)*255));
 }
 
-function controlLED(mode, interval = 0) {
+function controlLED(mode) {
   // Clear any previous intervals
   clearInterval(intervalId);
 
   if (mode === "off") {
     // Turn off the LED
     led.digitalWrite(0);
-  } else if (mode === "flashing" && interval > 0) {
-    // Flash the LED at the specified interval
+  } else if (mode === "flashing") {
+    // Pulse the LED every second
+    let isOn = false;
     intervalId = setInterval(() => {
-      led.digitalWrite(led.digitalRead() ^ 1);
-    }, interval);
+      isOn = !isOn;
+      led.digitalWrite(isOn ? 1 : 0);
+    }, 1000);
   } else if (mode === "on") {
     // Turn on the LED
     led.digitalWrite(1);
