@@ -1,4 +1,6 @@
 const Gpio = require('pigpio').Gpio;
+const led = new Gpio(17, {mode: Gpio.OUTPUT});
+controlLED(0.25);
 const left_pos = new Gpio(13, {mode: Gpio.OUTPUT});
 const left_neg = new Gpio(19, {mode: Gpio.OUTPUT});
 const right_pos = new Gpio(18, {mode: Gpio.OUTPUT});
@@ -16,6 +18,7 @@ right_pos.on('error', (err) => console.error('right_pos error: ', err));
 right_neg.on('error', (err) => console.error('right_neg error: ', err));
 
 wss.on("connection", ws => {
+  controlLED();
     if (isConnected) {
         console.log("Connection refused. A client is already connected.");
         ws.terminate();
@@ -32,6 +35,7 @@ wss.on("connection", ws => {
     });
 
     ws.on("close", () => {
+        controlLED();
         console.log("Client has disconnected");
         driveMotors(0, 0);
         isConnected = false;
@@ -68,4 +72,17 @@ function pwmValue(input){
 
 function calculatePWM(input) {
     return Math.abs(Math.round((input/100)*255));
+}
+
+let intervalId;
+
+function controlLED( interval = 0) {
+  // Clear any previous intervals
+  clearInterval(intervalId);
+  if (interval > 0) {
+    // Flash the LEDs at the specified interval
+    intervalId = setInterval(() => {
+      led.digitalWrite(led.digitalRead() ^ 1);
+    }, interval);
+  }
 }
