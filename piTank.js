@@ -1,4 +1,5 @@
 const Gpio = require('pigpio').Gpio;
+let intervalId;
 const led = new Gpio(17, {mode: Gpio.OUTPUT});
 controlLED(0.25);
 const left_pos = new Gpio(13, {mode: Gpio.OUTPUT});
@@ -73,8 +74,6 @@ function pwmValue(input){
 function calculatePWM(input) {
     return Math.abs(Math.round((input/100)*255));
 }
-
-let intervalId;
 
 function controlLED( interval = 0) {
   // Clear any previous intervals
