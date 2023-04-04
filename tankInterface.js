@@ -126,19 +126,32 @@ function diffSteer(leftRightAxis, upDownAxis) {
   }
 
   function experimental(x, y) {
-    console.log(y);
+    // Define deadzone for joystick
+    const deadzone = 15;
+  
     // Check if joystick is not all the way forward or all the way back
-    if (y > -95 && y < 95) {
+    if (y > -99 && y < 99) {
+      // Check if joystick is within deadzone
+      if (Math.abs(x) < deadzone && Math.abs(y) < deadzone) {
+        return { left: 0, right: 0 };
+      }
+  
       // Map x-axis value to left/right speed difference
       const speedDiff = x * 0.5; // Scale input to appropriate range
-    
+  
       // Map y-axis value to overall speed
       const speed = Math.abs(y) * 0.5; // Scale input to appropriate range
-    
+  
       // Combine values to determine final speed of each track
-      const leftSpeed = Math.max(0, speed - Math.abs(speedDiff));
-      const rightSpeed = Math.max(0, speed + Math.abs(speedDiff));
-      console.log({left: leftSpeed, right: rightSpeed});
+      let leftSpeed, rightSpeed;
+      if (speedDiff > 0) {
+        leftSpeed = speed;
+        rightSpeed = speed - speedDiff;
+      } else {
+        leftSpeed = speed + speedDiff;
+        rightSpeed = speed;
+      }
+  
       // Adjust polarity of speed values based on y-axis direction
       if (y < 0) {
         return { left: -leftSpeed, right: -rightSpeed };
@@ -155,6 +168,7 @@ function diffSteer(leftRightAxis, upDownAxis) {
       }
     }
   }
+  
   
 
 //   function experimental(x, y) {
