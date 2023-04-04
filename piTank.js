@@ -2,10 +2,10 @@ const Gpio = require('pigpio').Gpio;
 let intervalId;
 const led = new Gpio(17, {mode: Gpio.OUTPUT});
 controlLED("flashing");
-const left_pos = new Gpio(13, {mode: Gpio.OUTPUT});
-const left_neg = new Gpio(19, {mode: Gpio.OUTPUT});
-const right_pos = new Gpio(18, {mode: Gpio.OUTPUT});
-const right_neg = new Gpio(12, {mode: Gpio.OUTPUT});
+const right_pos = new Gpio(13, {mode: Gpio.OUTPUT});
+const right_neg = new Gpio(19, {mode: Gpio.OUTPUT});
+const left_pos = new Gpio(18, {mode: Gpio.OUTPUT});
+const left_neg = new Gpio(12, {mode: Gpio.OUTPUT});
 const WebSocket = require("ws");
 const wss = new WebSocket.Server({ port: 8081 });
 let isConnected = false;
@@ -37,15 +37,13 @@ wss.on("connection", ws => {
     // Reset the timeout timer whenever a message is received
     clearTimeout(clientTimeoutId);
     clientTimeoutId = setTimeout(() => {
-      // The client has not sent a message for over 1 second
-      // Do something here, for example:
+      // The client has not sent a message for over 2 seconds
+      shutdown();
       console.log("Client has timed out.");
-      // Turn off the LED if there are no more connected clients
-      controlLED("off");
       isConnected = false;
       driveMotors(0, 0);
       ws.terminate();
-    }, 1000);
+    }, 2000);
   });
 
   ws.on("close", () => {
@@ -101,7 +99,7 @@ function controlLED(mode) {
     intervalId = setInterval(() => {
       isOn = !isOn;
       led.digitalWrite(isOn ? 1 : 0);
-    }, 1000);
+    }, 500);
   } else if (mode === "on") {
     // Turn on the LED
     led.digitalWrite(1);
@@ -110,13 +108,18 @@ function controlLED(mode) {
 
 // Function to handle the interrupt signal and turn off the LED
 function handleInterrupt() {
+  shutdown();
+  process.exit();
+}
+
+function shutdown() {
+  console.log("Shutting down");
   clearInterval(intervalId);
-  led.digitalWrite(0);
+  controlLED("off");
   left_pos.pwmWrite(0);
   left_neg.pwmWrite(0);
   right_pos.pwmWrite(0);
   right_neg.pwmWrite(0);
-  process.exit();
 }
 
 // Register the interrupt signal handler
