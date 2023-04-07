@@ -1,76 +1,64 @@
 #!/bin/bash
 
-# Install the required packages
-apt-get update
-apt-get install hostapd dnsmasq nginx
+# Prompt the user for their preferred Wi-Fi network details
+read -p "Enter the name of the Wi-Fi network you want to create: " wifi_ssid
+read -s -p "Enter a password for the Wi-Fi network: " wifi_password
+echo ""
+read -p "Enter your home Wi-Fi network's SSID: " home_ssid
+read -s -p "Enter your home Wi-Fi network's password: " home_password
+echo ""
 
-# Create the hostapd configuration file if it does not already exist
-if [ ! -f /etc/hostapd/hostapd.conf ]
-then
-  cat <<EOF >/etc/hostapd/hostapd.conf
-interface=wlan0
-driver=nl80211
-ssid=PiTank
+# Install necessary packages
+sudo apt update
+sudo apt install hostapd dnsmasq
+
+# Stop the hostapd and networking services
+sudo systemctl stop hostapd
+sudo systemctl stop networking
+
+# Configure the Wi-Fi access point (AP)
+sudo tee /etc/hostapd/hostapd.conf > /dev/null <<EOF
+interface=wlan1
+ssid=$wifi_ssid
 hw_mode=g
 channel=6
-wpa=0
-EOF
-fi
-
-# Create the dnsmasq configuration file if it does not already exist
-if [ ! -f /etc/dnsmasq.conf ]
-then
-  cat <<EOF >/etc/dnsmasq.conf
-interface=wlan0
-dhcp-range=192.168.4.2,192.168.4.20,255.255.255.0,12h
-dhcp-option=3,192.168.4.1
-dhcp-option=6,192.168.4.1
-server=8.8.8.8
-log-queries
-log-dhcp
-listen-address=127.0.0.1
-EOF
-fi
-
-# Create the bridge interface
-brctl addbr br0
-brctl addif br0 eth0 wlan0
-
-# Configure the /etc/network/interfaces file to use the bridge interface
-cat <<EOF >/etc/network/interfaces
-# The loopback network interface
-auto lo
-iface lo inet loopback
-
-# The primary network interface
-auto br0
-iface br0 inet dhcp
-  bridge_ports eth0 wlan0
+macaddr_acl=0
+auth_algs=1
+ignore_broadcast_ssid=0
+wpa=2
+wpa_passphrase=$wifi_password
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP
+rsn_pairwise=CCMP
 EOF
 
-# Configure the nginx server to serve the index.html file
-cat <<EOF >/etc/nginx/sites-enabled/default
-server {
-  listen 80;
-  root $(pwd);
-  index index.html;
+# Configure the Wi-Fi client
+sudo tee /etc/wpa_supplicant/wpa_supplicant.conf > /dev/null <<EOF
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+
+network={
+    ssid="$home_ssid"
+    psk="$home_password"
 }
 EOF
 
-# Restart the networking and nginx services
-systemctl restart networking
-systemctl restart nginx
+# Modify the dhcpcd configuration file
+sudo tee -a /etc/dhcpcd.conf > /dev/null <<EOF
+interface wlan1
+    static ip_address=192.168.4.1/24
+    nohook wpa_supplicant
+EOF
 
-# Run the node file
-cd $(pwd)
-npm install
+# Configure the DNS server
+sudo sed -i 's/^#interface=interface/interface=wlan1/' /etc/dnsmasq.conf
+sudo sed -i 's/^#dhcp-range/dhcp-range/' /etc/dnsmasq.conf
+sudo sed -i 's/^#domain-needed/domain-needed/' /etc/dnsmasq.conf
+sudo sed -i 's/^#bogus-priv/bogus-priv/' /etc/dnsmasq.conf
 
-# Add the script to the cron tasks to run on startup
-crontab -l > mycron
-echo "@reboot $(pwd)/setup.sh" >> mycron
+# Restart the hostapd, dnsmasq, and networking services
+sudo systemctl restart hostapd
+sudo systemctl restart dnsmasq
+sudo systemctl restart networking
 
-# Continuously run the piTank.js script
-while true
-do
-  sudo node pitank.js
-done
+echo "Wi-Fi network setup complete. The Raspberry Pi should now be broadcasting the \"$wifi_ssid\" network while also connected to your home Wi-Fi network \"$home_ssid\"."
