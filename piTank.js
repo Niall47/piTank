@@ -1,36 +1,75 @@
 const Gpio = require('pigpio').Gpio;
-const left_pos = new Gpio(13, {mode: Gpio.OUTPUT});
-const left_neg = new Gpio(19, {mode: Gpio.OUTPUT});
-const right_pos = new Gpio(18, {mode: Gpio.OUTPUT});
-const right_neg = new Gpio(12, {mode: Gpio.OUTPUT});
+let intervalId;
+const led = new Gpio(17, {mode: Gpio.OUTPUT});
+controlLED("flashing");
+const right_pos = new Gpio(13, {mode: Gpio.OUTPUT});
+const right_neg = new Gpio(19, {mode: Gpio.OUTPUT});
+const left_pos = new Gpio(18, {mode: Gpio.OUTPUT});
+const left_neg = new Gpio(12, {mode: Gpio.OUTPUT});
 const WebSocket = require("ws");
 const wss = new WebSocket.Server({ port: 8081 });
+let isConnected = false;
+let clientTimeoutId;
 
+console.log("Waiting for connection");
 
-// pigpio.initialize(); 
+// error handling
+left_pos.on('error', (err) => console.error('left_pos error: ', err));
+left_neg.on('error', (err) => console.error('left_neg error: ', err));
+right_pos.on('error', (err) => console.error('right_pos error: ', err));
+right_neg.on('error', (err) => console.error('right_neg error: ', err));
+
 wss.on("connection", ws => {
-    console.log("New client connected");
+  if (isConnected) {
+    console.log("Connection refused. A client is already connected.");
+    ws.terminate();
+    return;
+  }
 
-    ws.on("message", data => {
-        let input = `${data}`;
-        cleanInput = JSON.parse(input);
-       driveMotors(cleanInput.left, cleanInput.right);
-    });
+  controlLED("on");
+  isConnected = true;
+  console.log("New client connected");
 
-    ws.on("close", () => {
-        console.log("Client has disconnected");
-    });
+  ws.on("message", data => {
+    let input = `${data}`;
+    cleanInput = JSON.parse(input);
+    driveMotors(cleanInput.left, cleanInput.right);
+    // Reset the timeout timer whenever a message is received
+    clearTimeout(clientTimeoutId);
+    clientTimeoutId = setTimeout(() => {
+      // The client has not sent a message for over 2 seconds
+      shutdown();
+      console.log("Client has timed out.");
+      isConnected = false;
+      driveMotors(0, 0);
+      ws.terminate();
+    }, 2000);
+  });
 
+  ws.on("close", () => {
+    console.log("Client has disconnected");
+    controlLED("off");
+    isConnected = false;
+    driveMotors(0, 0);
+  });
 });
+
+
 function driveMotors(left,right){
 
     left_inputs = pwmValue(left);
     right_inputs = pwmValue(right);
     console.log(pwmValue(left) + '    '+ pwmValue(right));
-    left_pos.pwmWrite(left_inputs[0]);
-    left_neg.pwmWrite(left_inputs[1]);
-    right_pos.pwmWrite(right_inputs[0]);
-    right_neg.pwmWrite(right_inputs[1]);
+    // error handling
+    try {
+        left_pos.pwmWrite(left_inputs[0]);
+        left_neg.pwmWrite(left_inputs[1]);
+        right_pos.pwmWrite(right_inputs[0]);
+        right_neg.pwmWrite(right_inputs[1]);
+    } catch (err) {
+        console.error('Error while writing to GPIO pins: ', err);
+    }
+    console.log(`Left Pos: ${left_pos.digitalRead()}, Left Neg: ${left_neg.digitalRead()}, Right Pos: ${right_pos.digitalRead()}, Right Neg: ${right_neg.digitalRead()}`);
 };
 
 function pwmValue(input){
@@ -47,14 +86,41 @@ function calculatePWM(input) {
     return Math.abs(Math.round((input/100)*255));
 }
 
-// function calculateInput(percentage){
-//     if (percentage === 0 ){
-//         return [0,0]
-//     } else if (percentage > 0){
-//         return [pwmValue(percentage), pwmValue(percentage)]
+function controlLED(mode) {
+  // Clear any previous intervals
+  clearInterval(intervalId);
 
-//         console.log(percentage);
-//     } else if (percentage < 0){
-//         console.log(percentage)
-//     };
-// };
+  if (mode === "off") {
+    // Turn off the LED
+    led.digitalWrite(0);
+  } else if (mode === "flashing") {
+    // Pulse the LED every second
+    let isOn = false;
+    intervalId = setInterval(() => {
+      isOn = !isOn;
+      led.digitalWrite(isOn ? 1 : 0);
+    }, 500);
+  } else if (mode === "on") {
+    // Turn on the LED
+    led.digitalWrite(1);
+  }
+}
+
+// Function to handle the interrupt signal and turn off the LED
+function handleInterrupt() {
+  shutdown();
+  process.exit();
+}
+
+function shutdown() {
+  console.log("Shutting down");
+  clearInterval(intervalId);
+  controlLED("off");
+  left_pos.pwmWrite(0);
+  left_neg.pwmWrite(0);
+  right_pos.pwmWrite(0);
+  right_neg.pwmWrite(0);
+}
+
+// Register the interrupt signal handler
+process.on('SIGINT', handleInterrupt);

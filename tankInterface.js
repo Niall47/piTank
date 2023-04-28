@@ -125,24 +125,70 @@ function diffSteer(leftRightAxis, upDownAxis) {
     return {left, right};
   }
 
-function experimental(x,y){
-    r = Math.hypot(x,y);
-    t = Math.atan2(y,x);
+  function experimental(x, y) {
+    // Define deadzone for joystick
+    const deadzone = 15;
+  
+    // Check if joystick is not all the way forward or all the way back
+    if (y > -99 && y < 99) {
+      // Check if joystick is within deadzone
+      if (Math.abs(x) < deadzone && Math.abs(y) < deadzone) {
+        return { left: 0, right: 0 };
+      }
+  
+      // Map x-axis value to left/right speed difference
+      const speedDiff = x * 0.5; // Scale input to appropriate range
+  
+      // Map y-axis value to overall speed
+      const speed = Math.abs(y) * 0.5; // Scale input to appropriate range
+  
+      // Combine values to determine final speed of each track
+      let leftSpeed, rightSpeed;
+      if (speedDiff > 0) {
+        leftSpeed = speed;
+        rightSpeed = speed - speedDiff;
+      } else {
+        leftSpeed = speed + speedDiff;
+        rightSpeed = speed;
+      }
+  
+      // Adjust polarity of speed values based on y-axis direction
+      if (y < 0) {
+        return { left: -leftSpeed, right: -rightSpeed };
+      } else {
+        return { left: leftSpeed, right: rightSpeed };
+      }
+    } else {
+      // Joystick is all the way forward or all the way back
+      // Send maximum speed to both tracks in the appropriate direction
+      if (y < 0) {
+        return { left: -100, right: -100 };
+      } else {
+        return { left: 100, right: 100 };
+      }
+    }
+  }
+  
+  
 
-    t += Math.PI / 4;
-
-    left = r * Math.cos(t);
-    right = r * Math.sin(t);
-
-    left = left * Math.sqrt(2);
-    right = right * Math.sqrt(2);
-
-    // left = Math.max(-100, Math.min(left, 100));
-    // right = Math.max(-100, Math.min(right, 100));
-    left = Math.round(left);
-    right = Math.round(right);
-    return {left, right};
-};
+//   function experimental(x, y) {
+//     // Map x-axis value to left/right speed difference
+//     const speedDiff = x * 0.5 + y * 0.5; // Scale input to appropriate range and add y-axis value
+    
+//     // Map y-axis value to overall speed
+//     const speed = Math.abs(y) * 0.5; // Scale input to appropriate range
+    
+//     // Combine values to determine final speed of each track
+//     const leftSpeed = Math.max(0, speed - Math.abs(speedDiff));
+//     const rightSpeed = Math.max(0, speed + Math.abs(speedDiff));
+    
+//     // Adjust polarity of speed values based on y-axis direction
+//     if (y < 0) {
+//       return { left: -leftSpeed, right: -rightSpeed };
+//     } else {
+//       return { left: leftSpeed, right: rightSpeed };
+//     }
+//   }
 
 function changeSteeringAlgorithm() {
     algorithm = getSteeringAlgorithm();
@@ -178,10 +224,12 @@ function sendPayload(payload) {
 
 setInterval(function() {
     let directions = getDirection()
-    motorInputs = getMotorInputs(directions.Y, directions.Y);
+
+    motorInputs = getMotorInputs(directions.X, directions.Y);
     motorInputPayload = JSON.stringify(motorInputs);
     driveValues.innerHTML = motorInputPayload
     direction.innerHTML = JSON.stringify(directions);
+
     if (connectionStatus === true) {
         sendPayload(motorInputPayload);
     };
