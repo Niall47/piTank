@@ -1,19 +1,16 @@
 {
-  "name": "sever",
+  "name": "pitank",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "piTank.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node piTank.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bootstrap": "^5.2.3",
-    "child_process": "^1.0.2",
-    "diff-steer": "0.0.2",
-    "gpio": "^0.2.10",
     "pigpio": "^3.3.1",
     "sys": "0.0.1",
     "ws": "^8.13.0"
