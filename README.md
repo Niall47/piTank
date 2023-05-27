@@ -10,7 +10,9 @@
 
 `npm install`
 
-`sudo node piTank.js`
+`sudo docker build -t pitank  .`
+
+`sudo docker run --privileged -p 8081:8081 pitank`
 
 ## Control
 
