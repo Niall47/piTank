@@ -8,11 +8,9 @@
 
 `curl -sSL https://get.docker.com | sh`
 
-`npm install`
+`sudo python3 -m pip install docker-compose`
 
-`sudo docker build -t pitank  .`
-
-`sudo docker run --privileged -p 8081:8081 pitank`
+`sudo docker compose up --build`
 
 ## Control
 

@@ -1,0 +1,16 @@
+version: '3'
+services:
+  gpio_controller:
+    build:
+      context: ./gpio_controller
+      dockerfile: Dockerfile
+    privileged: true
+    ports:
+      - 8081:8081
+
+  joystick_controller:
+    build:
+      context: ./joystick_controller
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
