@@ -1,4 +1,5 @@
 function updateCanvas(value, track) {
+    console.log("canvas being called")
     var canvas = document.getElementById(track);
     var context = canvas.getContext('2d');
 

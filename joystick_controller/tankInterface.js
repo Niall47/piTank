@@ -3,10 +3,9 @@ var joyParam = { "title": "joystick",
                 "width": 300,
                 "height": 300 };
 var connectionStatus = false;
+var connectTabButton = document.getElementById('connectTabButton');
 let refreshRate = document.getElementById("refreshRate");
 let refreshRateText = document.getElementById("refreshRateText");
-connectedBlock = document.getElementById("connectedBlock");
-disconnectedBlock = document.getElementById("disconnectedBlock");
 const status = document.getElementById("status");
 direction = document.getElementById("direction");
 customInput = document.getElementById("customIP");
@@ -15,7 +14,7 @@ driveValues = document.getElementById("driveValues");
 var algorithm = getSteeringAlgorithm();
 rateUpdate();
 Joy = new JoyStick('joyDiv', joyParam);
-// Vis = new Visualiser('visualiserDiv', {})
+Vis = new Visualiser('visualiserDiv', {});
 
 function connect(t) {
 
@@ -42,11 +41,13 @@ function customConnect() {
 
 function updateDisplay() {
     if (connectionStatus === true) {
-        connectedBlock.style.visibility = 'visible'
-        disconnectedBlock.style.visibility = 'hidden'
+        // connectedBlock.style.visibility = 'visible'
+        // disconnectedBlock.style.visibility = 'hidden'
+        connectTabButton.style.backgroundColor = 'green';
     } else {
-        connectedBlock.style.visibility = 'hidden'
-        disconnectedBlock.style.visibility = 'visible'
+        // connectedBlock.style.visibility = 'hidden'
+        // disconnectedBlock.style.visibility = 'visible'
+        connectTabButton.style.backgroundColor = 'red';
     }
 };
 
@@ -125,7 +126,7 @@ function diffSteer(leftRightAxis, upDownAxis) {
     return {left, right};
   }
 
-  function experimental(x, y) {
+function experimental(x, y) {
     // Define deadzone for joystick
     const deadzone = 15;
   
@@ -168,27 +169,6 @@ function diffSteer(leftRightAxis, upDownAxis) {
       }
     }
   }
-  
-  
-
-//   function experimental(x, y) {
-//     // Map x-axis value to left/right speed difference
-//     const speedDiff = x * 0.5 + y * 0.5; // Scale input to appropriate range and add y-axis value
-    
-//     // Map y-axis value to overall speed
-//     const speed = Math.abs(y) * 0.5; // Scale input to appropriate range
-    
-//     // Combine values to determine final speed of each track
-//     const leftSpeed = Math.max(0, speed - Math.abs(speedDiff));
-//     const rightSpeed = Math.max(0, speed + Math.abs(speedDiff));
-    
-//     // Adjust polarity of speed values based on y-axis direction
-//     if (y < 0) {
-//       return { left: -leftSpeed, right: -rightSpeed };
-//     } else {
-//       return { left: leftSpeed, right: rightSpeed };
-//     }
-//   }
 
 function changeSteeringAlgorithm() {
     algorithm = getSteeringAlgorithm();
@@ -220,6 +200,26 @@ function sendPayload(payload) {
     console.log('sending: ' + payload)
     ws.send(payload)
 };
+
+function openTab(tabName) {
+    var tabContent = document.getElementsByClassName('tabContent');
+    var tabButtons = document.getElementsByClassName('tabButton');
+
+    for (var i = 0; i < tabContent.length; i++) {
+        tabContent[i].style.display = 'none';
+    }
+
+    for (var i = 0; i < tabButtons.length; i++) {
+        tabButtons[i].className = tabButtons[i].className.replace(' active', '');
+    }
+
+    document.getElementById(tabName).style.display = 'block';
+    document.querySelector('button[onclick="openTab(\'' + tabName + '\')"]').className += ' active';
+}
+
+// Initialize the default tab
+openTab('driveTab');
+
 
 
 setInterval(function() {

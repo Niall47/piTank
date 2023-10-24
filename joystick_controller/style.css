@@ -1,13 +1,10 @@
+/* Updated CSS */
 html,
 body {
   height: 100%;
-}
-
-body {
-  display: flex;
-  align-items: center;
-  padding-top: 40px;
-  padding-bottom: 40px;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
   background-color: #f5f5f5;
 }
 
@@ -24,18 +21,6 @@ body {
 
 .form-signin .form-floating:focus-within {
   z-index: 2;
-}
-
-.form-signin input[type="email"] {
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
-
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
 }
 
 .bd-placeholder-img {
@@ -108,10 +93,40 @@ body {
 
 /* Style the indicator (dot/circle) */
 .container .checkmark:after {
- 	top: 9px;
-	left: 9px;
-	width: 8px;
-	height: 8px;
-	border-radius: 50%;
-	background: white;
+  top: 9px;
+  left: 9px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+}
+
+/* Style for the tab buttons */
+.tabButton {
+  background-color: #f5f5f5;
+  border: none;
+  color: #000;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.tabButton.active {
+  background-color: #2196F3;
+  color: #fff;
+}
+
+/* Style for the tab content */
+.tabContent {
+  display: none;
+  padding: 20px;
+  position: absolute;
+  top: 50px; /* Adjust as needed */
+  left: 50%; /* Center horizontally */
+  transform: translateX(-50%);
+  background-color: #f5f5f5;
+}
+
+.tabContent.active {
+  display: block;
 }
