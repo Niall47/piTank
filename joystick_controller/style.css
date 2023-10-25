@@ -8,18 +8,18 @@ body {
   background-color: #f5f5f5;
 }
 
-.form-signin {
+.pi-tank {
   width: 100%;
   max-width: 330px;
   padding: 15px;
   margin: auto;
 }
 
-.form-signin .checkbox {
+.pi-tank .checkbox {
   font-weight: 400;
 }
 
-.form-signin .form-floating:focus-within {
+.pi-tank .form-floating:focus-within {
   z-index: 2;
 }
 
@@ -129,4 +129,19 @@ body {
 
 .tabContent.active {
   display: block;
+}
+
+.joystick-container {
+  position: relative;
+  width: 200px; /* Adjust as needed */
+  height: 200px; /* Adjust as needed */
+}
+
+.joystick-handle {
+  position: absolute;
+  width: 50px; /* Adjust as needed */
+  height: 50px; /* Adjust as needed */
+  left: 50%; /* Move left by 50% of the container's width */
+  top: 50%; /* Move top by 50% of the container's height */
+  transform: translate(-50%, -50%); /* Center the element within the container */
 }

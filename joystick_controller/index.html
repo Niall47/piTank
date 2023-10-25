@@ -9,7 +9,7 @@
   <link href="style.css" rel="stylesheet">
 </head>
 <body class="text-center">
-<main class="form-signin">
+<main class="pi-tank">
   <div id="tabButtons">
     <button class="tabButton active" onclick="openTab('controlTab')">Control</button>
     <button class="tabButton" onclick="openTab('connectTab')">Connect</button>
@@ -30,33 +30,30 @@
         <span class="checkmark"></span>
       </label>
     </div>
+    <div class="checkbox mb-3">
+      <label id="refreshRateText" for="refreshRate" class="form-label">Refresh rate</label>
+      <input onchange="rateUpdate()" type="range" class="form-range" id="refreshRate" min="20" max="1000" step="20" value="200">
+    </div>
   </div>
   <div id="connectTab" class="tabContent">
-    <h1 class="h3 mb-3 fw-normal">Connect to tank</h1>
     <div class="form-floating">
       <input type="email" value="192.168.0.63" class="form-control" id="customIP">
-      <label for="floatingInput">IP</label>
+      <label for="customIP">IP</label>
     </div>
     <div class="form-floating">
       <input type="text" value="8081" class="form-control" id="customPort">
-      <label for="floatingPassword">Port</label>
+      <label for="customPort">Port</label>
     </div>
-    <label id="refreshRateText" for="customRange1" class="form-label">Refresh rate</label>
-    <input onchange="rateUpdate()" type="range" class="form-range" id="refreshRate" min="20" max="1000" step="20" value="200">
     <button id="connectButton" onclick="customConnect()" class="w-100 btn btn-lg btn-primary" type="submit">Connect</button>
   </div>
   <div id="driveTab" class="tabContent" style="display: none;">
-    <!-- Content for the "Drive" tab, including the joystick and tankVisualiser -->#
-    <div id="visualiserDiv">
-<!--      visualiserDiv-->
-      <canvas id="leftTrack" width="100" height="400"></canvas>
-      <canvas id="rightTrack" width="100" height="400"></canvas>
-    </div>
-
     <div id="joyDiv" class="mt-5 mb-3" width="300px" height="300px"></div>
     <pre id="direction">Joystick Values</pre>
     <pre id="driveValues">Drive Values</pre>
-    <!-- Add other content related to the "Drive" tab here -->
+    <div id="visualiserDiv">
+      <canvas id="leftTrack" width="100" height="300"></canvas>
+      <canvas id="rightTrack" width="100" height="300"></canvas>
+    </div>
   </div>
 </main>
 <script src="joy.js"></script>

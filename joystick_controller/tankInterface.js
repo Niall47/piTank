@@ -14,7 +14,6 @@ driveValues = document.getElementById("driveValues");
 var algorithm = getSteeringAlgorithm();
 rateUpdate();
 Joy = new JoyStick('joyDiv', joyParam);
-Vis = new Visualiser('visualiserDiv', {});
 
 function connect(t) {
 
@@ -41,12 +40,8 @@ function customConnect() {
 
 function updateDisplay() {
     if (connectionStatus === true) {
-        // connectedBlock.style.visibility = 'visible'
-        // disconnectedBlock.style.visibility = 'hidden'
         connectTabButton.style.backgroundColor = 'green';
     } else {
-        // connectedBlock.style.visibility = 'hidden'
-        // disconnectedBlock.style.visibility = 'visible'
         connectTabButton.style.backgroundColor = 'red';
     }
 };
@@ -220,8 +215,6 @@ function openTab(tabName) {
 // Initialize the default tab
 openTab('driveTab');
 
-
-
 setInterval(function() {
     let directions = getDirection()
 
@@ -235,5 +228,5 @@ setInterval(function() {
     };
     updateCanvas(motorInputs.right, 'rightTrack');
     updateCanvas(motorInputs.left, 'leftTrack');
-      }, parseInt(refreshRate.value)), 
+      }, parseInt(refreshRate.value)),
      updateDisplay();
