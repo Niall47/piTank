@@ -1,63 +1,49 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
   <title>PiTank</title>
-  <meta name="description" content="JoyStick">
+  <meta content="JoyStick" name="description">
   <link href="bootstrap.min.css" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
 </head>
 <body class="text-center">
 <main class="pi-tank">
   <div id="tabButtons">
-    <button class="tabButton active" onclick="openTab('controlTab')">Control</button>
-    <button class="tabButton" onclick="openTab('connectTab')">Connect</button>
-    <button class="tabButton" onclick="openTab('driveTab')">Drive</button>
+    <button class="tabButton active" onclick="openTab('controlTab')">Control</button> <button class="tabButton" onclick="openTab('connectTab')">Connect</button> <button class="tabButton" onclick="openTab('driveTab')">Drive</button>
   </div>
-  <div id="controlTab" class="tabContent">
+  <div class="tabContent" id="controlTab">
     <div class="checkbox mb-3">
-      <label class="container">Compass steering 100% throttle
-        <input type="radio" onchange="changeSteeringAlgorithm()" checked="checked" name="algorithm" id="compass">
-        <span class="checkmark"></span>
-      </label>
-      <label class="container">Diff Steer
-        <input type="radio" onchange="changeSteeringAlgorithm()" name="algorithm" id="diffsteer">
-        <span class="checkmark"></span>
-      </label>
-      <label class="container">Experimental
-        <input type="radio" onchange="changeSteeringAlgorithm()" name="algorithm" id="experimental">
-        <span class="checkmark"></span>
-      </label>
+      <label class="container">Compass steering 100% throttle <input checked="checked" id="compass" name="algorithm" onchange="changeSteeringAlgorithm()" type="radio"> <span class="checkmark"></span></label> <label class="container">Diff Steer <input id="diffsteer" name="algorithm" onchange="changeSteeringAlgorithm()" type="radio"> <span class="checkmark"></span></label> <label class="container">Experimental <input id="experimental" name="algorithm" onchange="changeSteeringAlgorithm()" type="radio"> <span class="checkmark"></span></label>
     </div>
     <div class="checkbox mb-3">
-      <label id="refreshRateText" for="refreshRate" class="form-label">Refresh rate</label>
-      <input onchange="rateUpdate()" type="range" class="form-range" id="refreshRate" min="100" max="1000" step="20" value="200">
+      <label class="form-label" for="refreshRate" id="refreshRateText">Refresh rate</label> <input class="form-range" id="refreshRate" max="1000" min="100" onchange="rateUpdate()" step="20" type="range" value="200">
     </div>
   </div>
-  <div id="connectTab" class="tabContent">
+  <div class="tabContent" id="connectTab">
     <div class="form-floating">
-      <input type="text" value="192.168.0.63" class="form-control" id="customIP">
-      <label for="customIP">IP</label>
+      <input class="form-control" id="customIP" type="text" value="192.168.0.63"> <label for="customIP">IP</label>
     </div>
     <div class="form-floating">
-      <input type="text" value="8081" class="form-control" id="customPort">
-      <label for="customPort">Port</label>
-    </div>
-    <button id="connectButton" onclick="customConnect()" class="w-100 btn btn-lg btn-primary" type="submit">Connect</button>
+      <input class="form-control" id="customPort" type="text" value="8081"> <label for="customPort">Port</label>
+    </div><button class="w-100 btn btn-lg btn-primary" id="connectButton" onclick="customConnect()" type="submit">Connect</button>
   </div>
-  <div id="driveTab" class="tabContent" style="display: none;">
-    <div id="joyDiv" class="mt-5 mb-3" width="300px" height="300px"></div>
+  <div class="tabContent" id="driveTab" style="display: none;">
+    <div class="mt-5 mb-3" id="joyDiv"></div>
     <pre id="direction">Joystick Values</pre>
     <pre id="driveValues">Drive Values</pre>
     <div id="visualiserDiv">
-      <canvas id="leftTrack" width="100" height="300"></canvas>
-      <canvas id="rightTrack" width="100" height="300"></canvas>
+      <canvas height="300" id="leftTrack" width="100"></canvas>
+      <canvas height="300" id="rightTrack" width="100"></canvas>
     </div>
   </div>
 </main>
-<script src="joy.js"></script>
-<script src="tankVisualiser.js"></script>
-<script src="tankInterface.js"></script>
+<script src="joy.js">
+</script>
+<script src="tankVisualiser.js">
+</script>
+<script src="tankInterface.js">
+</script>
 </body>
 </html>

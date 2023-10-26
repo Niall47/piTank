@@ -1,7 +1,8 @@
-
-var joyParam = { "title": "joystick",
-                "width": 300,
-                "height": 300 };
+var joyParam = {
+    "title": "joystick",
+    "width": 300,
+    "height": 300
+};
 var connectionStatus = false;
 var connectTabButton = document.getElementById('connectTabButton');
 let refreshRateText = document.getElementById("refreshRateText");
@@ -12,7 +13,6 @@ connectButton = document.getElementById("connectButton");
 driveValues = document.getElementById("driveValues");
 var algorithm = getSteeringAlgorithm();
 Joy = new JoyStick('joyDiv', joyParam);
-
 // Initialize the default tab
 openTab('driveTab');
 let intervalID;
@@ -21,14 +21,13 @@ const refreshRate = document.getElementById("refreshRate");
 startInterval();
 
 function connect(t) {
-
     var url = `ws://${customInput.value}:${customPort.value}`;
     console.log(`Trying to connect to ${url}`)
     try {
         ws = new WebSocket(`${url}`), ws.addEventListener("open", () => {
-        connectionStatus = !0, console.log("We are connected"), updateDisplay()
+            connectionStatus = !0, console.log("We are connected"), updateDisplay()
         }), ws.addEventListener("close", () => {
-        connectionStatus = !1, console.log("We were disconnected"), updateDisplay()
+            connectionStatus = !1, console.log("We were disconnected"), updateDisplay()
         })
     } catch {
         console.log("Couldn't connect to " + url)
@@ -47,18 +46,17 @@ function updateDisplay() {
     }
 };
 
- function disconnect() {
+function disconnect() {
     connectionStatus = false
     ws.close()
     updateDisplay()
- };
+};
 
 function clamp(num, min, max) {
     return Math.min(Math.max(num, min), max);
- };
+};
 
 function compass(x, y) {
-
     direction = Joy.GetDir();
     var powerValues = {
         C: [0, 0],
@@ -70,10 +68,13 @@ function compass(x, y) {
         SW: [50, -50],
         W: [-100, 100],
         NW: [-75, 75]
-      };
+    };
     left = powerValues[direction][0];
     right = powerValues[direction][1];
-    return {left, right};
+    return {
+        left,
+        right
+    };
 };
 
 function diffSteer(leftRightAxis, upDownAxis) {
@@ -89,79 +90,85 @@ function diffSteer(leftRightAxis, upDownAxis) {
     var rightMotorOutput = 0;
     var rightMotorScale = 0;
     var throttle;
-
     // Adjust for the joystick being used
     leftRightAxis = leftRightAxis / 100;
-
     // Invert the Y-axis
     upDownAxis = -upDownAxis / 100;
-
     // Calculate Throttled Steering Motor values
     direction = leftRightAxis / maxAxis;
-
     // Turn with throttle
     leftMotorScale = upDownAxis * (1 + direction);
     leftMotorScale = clamp(leftMotorScale, minAxis, maxAxis); // Govern Axis to Minimum and Maximum range
     rightMotorScale = upDownAxis * (1 - direction);
     rightMotorScale = clamp(rightMotorScale, minAxis, maxAxis); // Govern Axis to Minimum and Maximum range
-
     // Calculate No Throttle Steering Motors values (Turn with little to no throttle)
     throttle = 1 - Math.abs(upDownAxis / maxAxis); // Throttle inverse magnitude (1 = min, 0 = max)
     leftMotorNoThrottleScale = -leftRightAxis * throttle;
     rightMotorNoThrottleTurnScale = leftRightAxis * throttle;
-
     // Calculate final motor output values, scale to -100 to 100
     leftMotorOutput = Math.round((leftMotorScale + leftMotorNoThrottleScale) * axisFlip * maxSpeed);
     leftMotorOutput = clamp(leftMotorOutput, -maxSpeed, maxSpeed);
     rightMotorOutput = Math.round((rightMotorScale + rightMotorNoThrottleTurnScale) * axisFlip * maxSpeed);
     rightMotorOutput = clamp(rightMotorOutput, -maxSpeed, maxSpeed);
-
-    return { left: leftMotorOutput, right: rightMotorOutput };
+    return {
+        left: leftMotorOutput,
+        right: rightMotorOutput
+    };
 }
 
 function experimental(x, y) {
     // Define deadzone for joystick
     const deadzone = 15;
-  
     // Check if joystick is not all the way forward or all the way back
     if (y > -99 && y < 99) {
-      // Check if joystick is within deadzone
-      if (Math.abs(x) < deadzone && Math.abs(y) < deadzone) {
-        return { left: 0, right: 0 };
-      }
-  
-      // Map x-axis value to left/right speed difference
-      const speedDiff = x * 0.5; // Scale input to appropriate range
-  
-      // Map y-axis value to overall speed
-      const speed = Math.abs(y) * 0.5; // Scale input to appropriate range
-  
-      // Combine values to determine final speed of each track
-      let leftSpeed, rightSpeed;
-      if (speedDiff > 0) {
-        leftSpeed = speed;
-        rightSpeed = speed - speedDiff;
-      } else {
-        leftSpeed = speed + speedDiff;
-        rightSpeed = speed;
-      }
-  
-      // Adjust polarity of speed values based on y-axis direction
-        if (y < 0) {
-            return { left: -Math.floor(leftSpeed), right: -Math.floor(rightSpeed) };
+        // Check if joystick is within deadzone
+        if (Math.abs(x) < deadzone && Math.abs(y) < deadzone) {
+            return {
+                left: 0,
+                right: 0
+            };
+        }
+        // Map x-axis value to left/right speed difference
+        const speedDiff = x * 0.5; // Scale input to appropriate range
+        // Map y-axis value to overall speed
+        const speed = Math.abs(y) * 0.5; // Scale input to appropriate range
+        // Combine values to determine final speed of each track
+        let leftSpeed, rightSpeed;
+        if (speedDiff > 0) {
+            leftSpeed = speed;
+            rightSpeed = speed - speedDiff;
         } else {
-            return { left: Math.floor(leftSpeed), right: Math.floor(rightSpeed) };
+            leftSpeed = speed + speedDiff;
+            rightSpeed = speed;
+        }
+        // Adjust polarity of speed values based on y-axis direction
+        if (y < 0) {
+            return {
+                left: -Math.floor(leftSpeed),
+                right: -Math.floor(rightSpeed)
+            };
+        } else {
+            return {
+                left: Math.floor(leftSpeed),
+                right: Math.floor(rightSpeed)
+            };
         }
     } else {
-      // Joystick is all the way forward or all the way back
-      // Send maximum speed to both tracks in the appropriate direction
-      if (y < 0) {
-        return { left: -100, right: -100 };
-      } else {
-        return { left: 100, right: 100 };
-      }
+        // Joystick is all the way forward or all the way back
+        // Send maximum speed to both tracks in the appropriate direction
+        if (y < 0) {
+            return {
+                left: -100,
+                right: -100
+            };
+        } else {
+            return {
+                left: 100,
+                right: 100
+            };
+        }
     }
-  };
+};
 
 function changeSteeringAlgorithm() {
     algorithm = getSteeringAlgorithm();
@@ -172,21 +179,24 @@ function getSteeringAlgorithm() {
     return document.querySelector('input[name="algorithm"]:checked').id;
 };
 
-function getMotorInputs(x,y){
+function getMotorInputs(x, y) {
     switch (algorithm) {
         case "compass":
-            return compass(x,y);
+            return compass(x, y);
         case "diffsteer":
-            return diffSteer(x,y);
+            return diffSteer(x, y);
         case "experimental":
-            return experimental(x,y);
+            return experimental(x, y);
     }
 };
 
 function getDirection() {
     joyX = Joy.GetX();
     joyY = Joy.GetY();
-    return {X: joyX, Y: joyY};
+    return {
+        X: joyX,
+        Y: joyY
+    };
 };
 
 function sendPayload(payload) {
@@ -197,15 +207,12 @@ function sendPayload(payload) {
 function openTab(tabName) {
     var tabContent = document.getElementsByClassName('tabContent');
     var tabButtons = document.getElementsByClassName('tabButton');
-
     for (var i = 0; i < tabContent.length; i++) {
         tabContent[i].style.display = 'none';
     }
-
     for (var i = 0; i < tabButtons.length; i++) {
         tabButtons[i].className = tabButtons[i].className.replace(' active', '');
     }
-
     document.getElementById(tabName).style.display = 'block';
     document.querySelector('button[onclick="openTab(\'' + tabName + '\')"]').className += ' active';
 }
@@ -216,21 +223,18 @@ function rateUpdate() {
 }
 
 function startInterval() {
-    intervalID = setInterval(function () {
+    intervalID = setInterval(function() {
         let directions = getDirection();
-
         motorInputs = getMotorInputs(directions.X, directions.Y);
         motorInputPayload = JSON.stringify(motorInputs);
         driveValues.innerHTML = motorInputPayload;
         direction.innerHTML = JSON.stringify(directions);
-
         if (connectionStatus === true) {
             sendPayload(motorInputPayload);
         }
         updateCanvas(motorInputs.right, 'rightTrack');
         updateCanvas(motorInputs.left, 'leftTrack');
     }, parseInt(refreshRate.value));
-
     // Update the label text with the current refresh rate
     refreshRateText.textContent = `Refresh rate: ${refreshRate.value} ms`;
 }
