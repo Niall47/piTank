@@ -4,7 +4,6 @@ var joyParam = { "title": "joystick",
                 "height": 300 };
 var connectionStatus = false;
 var connectTabButton = document.getElementById('connectTabButton');
-let refreshRate = document.getElementById("refreshRate");
 let refreshRateText = document.getElementById("refreshRateText");
 const status = document.getElementById("status");
 direction = document.getElementById("direction");
@@ -12,8 +11,14 @@ customInput = document.getElementById("customIP");
 connectButton = document.getElementById("connectButton");
 driveValues = document.getElementById("driveValues");
 var algorithm = getSteeringAlgorithm();
-rateUpdate();
 Joy = new JoyStick('joyDiv', joyParam);
+
+// Initialize the default tab
+openTab('driveTab');
+let intervalID;
+const refreshRate = document.getElementById("refreshRate");
+// Call startInterval to initialize with the default refresh rate
+startInterval();
 
 function connect(t) {
 
@@ -29,10 +34,6 @@ function connect(t) {
         console.log("Couldn't connect to " + url)
     }
 };
-
-function rateUpdate(){
-    refreshRateText.textContent = "Refresh rate (ms): " + refreshRate.value;
-}
 
 function customConnect() {
     connect(customInput.value)
@@ -76,11 +77,9 @@ function compass(x, y) {
 };
 
 function diffSteer(leftRightAxis, upDownAxis) {
-    // console.log(leftRightAxis);
-    // console.log(upDownAxis);
     axisFlip = -1;
     maxAxis = 1;
-    maxSpeed = 255;
+    maxSpeed = 100; // Set maxSpeed to 100 to represent percentages
     minAxis = -1;
     var direction = 0;
     var leftMotorNoThrottleScale = 0;
@@ -90,36 +89,35 @@ function diffSteer(leftRightAxis, upDownAxis) {
     var rightMotorOutput = 0;
     var rightMotorScale = 0;
     var throttle;
-  
+
     // Adjust for the joystick being used
     leftRightAxis = leftRightAxis / 100;
-    upDownAxis = upDownAxis / 100;
 
+    // Invert the Y-axis
+    upDownAxis = -upDownAxis / 100;
 
     // Calculate Throttled Steering Motor values
     direction = leftRightAxis / maxAxis;
-  
-    // Turn with with throttle
+
+    // Turn with throttle
     leftMotorScale = upDownAxis * (1 + direction);
     leftMotorScale = clamp(leftMotorScale, minAxis, maxAxis); // Govern Axis to Minimum and Maximum range
     rightMotorScale = upDownAxis * (1 - direction);
     rightMotorScale = clamp(rightMotorScale, minAxis, maxAxis); // Govern Axis to Minimum and Maximum range
-  
+
     // Calculate No Throttle Steering Motors values (Turn with little to no throttle)
     throttle = 1 - Math.abs(upDownAxis / maxAxis); // Throttle inverse magnitude (1 = min, 0 = max)
     leftMotorNoThrottleScale = -leftRightAxis * throttle;
     rightMotorNoThrottleTurnScale = leftRightAxis * throttle;
-  
-    // Calculate final motor output values
-    leftMotorOutput = (leftMotorScale + leftMotorNoThrottleScale) * axisFlip;
-    leftMotorOutput = clamp(leftMotorOutput, minAxis, maxAxis);
-    rightMotorOutput = (rightMotorScale + rightMotorNoThrottleTurnScale) * axisFlip;
-    rightMotorOutput = clamp(rightMotorOutput, minAxis, maxAxis);
-    left = -(maxSpeed * leftMotorOutput);
-    right = -(maxSpeed * rightMotorOutput);
 
-    return {left, right};
-  }
+    // Calculate final motor output values, scale to -100 to 100
+    leftMotorOutput = Math.round((leftMotorScale + leftMotorNoThrottleScale) * axisFlip * maxSpeed);
+    leftMotorOutput = clamp(leftMotorOutput, -maxSpeed, maxSpeed);
+    rightMotorOutput = Math.round((rightMotorScale + rightMotorNoThrottleTurnScale) * axisFlip * maxSpeed);
+    rightMotorOutput = clamp(rightMotorOutput, -maxSpeed, maxSpeed);
+
+    return { left: leftMotorOutput, right: rightMotorOutput };
+}
 
 function experimental(x, y) {
     // Define deadzone for joystick
@@ -149,11 +147,11 @@ function experimental(x, y) {
       }
   
       // Adjust polarity of speed values based on y-axis direction
-      if (y < 0) {
-        return { left: -leftSpeed, right: -rightSpeed };
-      } else {
-        return { left: leftSpeed, right: rightSpeed };
-      }
+        if (y < 0) {
+            return { left: -Math.floor(leftSpeed), right: -Math.floor(rightSpeed) };
+        } else {
+            return { left: Math.floor(leftSpeed), right: Math.floor(rightSpeed) };
+        }
     } else {
       // Joystick is all the way forward or all the way back
       // Send maximum speed to both tracks in the appropriate direction
@@ -163,7 +161,7 @@ function experimental(x, y) {
         return { left: 100, right: 100 };
       }
     }
-  }
+  };
 
 function changeSteeringAlgorithm() {
     algorithm = getSteeringAlgorithm();
@@ -212,21 +210,27 @@ function openTab(tabName) {
     document.querySelector('button[onclick="openTab(\'' + tabName + '\')"]').className += ' active';
 }
 
-// Initialize the default tab
-openTab('driveTab');
+function rateUpdate() {
+    clearInterval(intervalID); // Clear any existing interval
+    startInterval();
+}
 
-setInterval(function() {
-    let directions = getDirection()
+function startInterval() {
+    intervalID = setInterval(function () {
+        let directions = getDirection();
 
-    motorInputs = getMotorInputs(directions.X, directions.Y);
-    motorInputPayload = JSON.stringify(motorInputs);
-    driveValues.innerHTML = motorInputPayload
-    direction.innerHTML = JSON.stringify(directions);
+        motorInputs = getMotorInputs(directions.X, directions.Y);
+        motorInputPayload = JSON.stringify(motorInputs);
+        driveValues.innerHTML = motorInputPayload;
+        direction.innerHTML = JSON.stringify(directions);
 
-    if (connectionStatus === true) {
-        sendPayload(motorInputPayload);
-    };
-    updateCanvas(motorInputs.right, 'rightTrack');
-    updateCanvas(motorInputs.left, 'leftTrack');
-      }, parseInt(refreshRate.value)),
-     updateDisplay();
+        if (connectionStatus === true) {
+            sendPayload(motorInputPayload);
+        }
+        updateCanvas(motorInputs.right, 'rightTrack');
+        updateCanvas(motorInputs.left, 'leftTrack');
+    }, parseInt(refreshRate.value));
+
+    // Update the label text with the current refresh rate
+    refreshRateText.textContent = `Refresh rate: ${refreshRate.value} ms`;
+}
