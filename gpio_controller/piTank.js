@@ -10,67 +10,115 @@ const WebSocket = require("ws");
 const wss = new WebSocket.Server({ port: 8081 });
 let isConnected = false;
 let clientTimeoutId;
+let connectionQueue = [];
+let currentClient = null;
 
 console.log("Waiting for connection");
 
 // error handling
-left_pos.on('error', (err) => console.error('left_pos error: ', err));
-left_neg.on('error', (err) => console.error('left_neg error: ', err));
+left_pos.on('error', (err) => console.error('left_pos error: ', err));  
+left_neg.on('error', (err) => console.error('left_neg error: ', err));  
 right_pos.on('error', (err) => console.error('right_pos error: ', err));
 right_neg.on('error', (err) => console.error('right_neg error: ', err));
 
-wss.on("connection", ws => {
-  if (isConnected) {
-    console.log("Connection refused. A client is already connected.");
-    ws.terminate();
-    return;
-  }
+let lastLeft = null, lastRight = null;
+let lastMsgTime = 0, droppedMsgs = 0;
+const MIN_MSG_INTERVAL = 100; // ms between processing messages
 
-  controlLED("on");
-  isConnected = true;
-  console.log("New client connected");
-
-  ws.on("message", data => {
-    let input = `${data}`;
-    cleanInput = JSON.parse(input);
-    driveMotors(cleanInput.left, cleanInput.right);
-    // Reset the timeout timer whenever a message is received
-    clearTimeout(clientTimeoutId);
-    clientTimeoutId = setTimeout(() => {
-      // The client has not sent a message for over 2 seconds
-      shutdown();
-      console.log("Client has timed out.");
-      isConnected = false;
-      driveMotors(0, 0);
-      ws.terminate();
-    }, 2000);
-  });
-
-  ws.on("close", () => {
-    console.log("Client has disconnected");
-    controlLED("off");
-    isConnected = false;
-    driveMotors(0, 0);
-  });
+// heartbeat support
+const HEARTBEAT_INTERVAL = 30000;
+wss.on("connection", (ws, req) => {
+   // capture and log client identity from handshake
+   const ua = req.headers['user-agent'] || 'Unknown';
+   console.log(`Client connected from ${req.socket.remoteAddress}:${req.socket.remotePort}`);
+   console.log(` → User-Agent: ${ua}`);
+   console.log(" → Handshake headers:", req.headers);
+    ws.isAlive = true;
+    ws.on("pong", () => ws.isAlive = true);
+    console.log(`Incoming connection (${connectionQueue.length + (isConnected?1:0)} in queue)`);
+    if (!isConnected) {
+        acceptClient(ws);
+    } else {
+        connectionQueue.push(ws);
+        ws.send(JSON.stringify({ status: "queued", position: connectionQueue.length }));
+        if (currentClient) currentClient.send(JSON.stringify({ status:"queue_update", position: connectionQueue.length }));
+        ws.on("close", () => {
+            connectionQueue = connectionQueue.filter(c => c !== ws);    
+            if (currentClient) currentClient.send(JSON.stringify({ status:"queue_update", position: connectionQueue.length }));
+        });
+    }
 });
 
+// periodically ping clients and terminate if no pong
+setInterval(() => {
+  wss.clients.forEach(ws => {
+    if (!ws.isAlive) {
+      console.warn("Terminating unresponsive client");
+      ws.terminate();
+    } else {
+      ws.isAlive = false;
+      ws.ping();
+    }
+  });
+}, HEARTBEAT_INTERVAL);
 
-function driveMotors(left,right){
+function acceptClient(ws) {
+    controlLED("on");
+    isConnected = true;
+    currentClient = ws;
+    console.log("New client connected");
+    ws.send(JSON.stringify({ status: "connected" }));
+    let clientTimeoutId;
 
-    left_inputs = pwmValue(left);
-    right_inputs = pwmValue(right);
-    console.log(pwmValue(left) + '    '+ pwmValue(right));
-    // error handling
+    ws.on("message", data => {
+        // always clear previous timeout to avoid spurious disconnects  
+        clearTimeout(clientTimeoutId);
+
+        const now = Date.now();
+        if (now - lastMsgTime < MIN_MSG_INTERVAL) {
+            droppedMsgs++;
+            console.warn(`Dropped old msg #${droppedMsgs}, Δ=${now - lastMsgTime}ms`);
+        } else {
+            lastMsgTime = now;
+            let { left, right } = JSON.parse(data);
+            driveMotors(left, right);
+        }
+
+        // schedule next timeout check
+        clientTimeoutId = setTimeout(() => {
+            console.error("Client timeout – no messages for 2s");       
+            ws.terminate();
+        }, 2000);
+    });
+
+    ws.on("close", () => {
+        console.log("Client has disconnected");
+        currentClient = null;
+        shutdownCurrent();
+        if (connectionQueue.length > 0) {
+            const next = connectionQueue.shift();
+            acceptClient(next);
+        }
+    });
+}
+
+function driveMotors(left, right) {
+    const left_inputs  = pwmValue(left);
+    const right_inputs = pwmValue(right);
+    // only log when inputs change
+    if (left !== lastLeft || right !== lastRight) {
+        console.log(`Drive command: L=${left}, R=${right}`);
+        lastLeft = left; lastRight = right;
+    }
     try {
         left_pos.pwmWrite(left_inputs[0]);
         left_neg.pwmWrite(left_inputs[1]);
         right_pos.pwmWrite(right_inputs[0]);
         right_neg.pwmWrite(right_inputs[1]);
     } catch (err) {
-        console.error('Error while writing to GPIO pins: ', err);
+        console.error('GPIO write error:', err);
     }
-    console.log(`Left Pos: ${left_pos.digitalRead()}, Left Neg: ${left_neg.digitalRead()}, Right Pos: ${right_pos.digitalRead()}, Right Neg: ${right_neg.digitalRead()}`);
-};
+}
 
 function pwmValue(input){
     positive = calculatePWM(input);
@@ -120,6 +168,12 @@ function shutdown() {
   left_neg.pwmWrite(0);
   right_pos.pwmWrite(0);
   right_neg.pwmWrite(0);
+}
+
+function shutdownCurrent() {
+    isConnected = false;
+    controlLED("off");
+    driveMotors(0, 0);
 }
 
 // Register the interrupt signal handler

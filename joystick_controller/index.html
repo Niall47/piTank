@@ -22,13 +22,24 @@
     </div>
   </div>
   <div class="tabContent" id="connectTab">
+    <div class="form-floating"><button class="btn btn-secondary" id="connectionStatusBar">Connection status</button></div>
+    <br><hr><br>
+    <div class="form-floating" id="connectionBlock">
+      <button class="btn btn-secondary" id="scanButton" onclick="scanIPrange()">Scan Network</button>
+      </div>
+    <br>
+    <h4>or</h4>
+    <br>
     <div class="form-floating">
-      <input class="form-control" id="customIP" type="text" value="192.168.0.63"> <label for="customIP">IP</label>
+      <input class="form-control" id="customIP" type="text" value="192.168.0.20"> <label for="customIP">IP</label>
     </div>
     <div class="form-floating">
       <input class="form-control" id="customPort" type="text" value="8081"> <label for="customPort">Port</label>
-    </div><button class="w-100 btn btn-lg btn-primary" id="connectButton" onclick="customConnect()" type="submit">Connect</button>
+    </div>
+    <button class="btn btn-secondary" id="connectButton" onclick="manualConnect()" type="submit">Connect</button>
   </div>
+</div>
+
   <div class="tabContent" id="driveTab" style="display: none;">
     <div class="mt-5 mb-3" id="joyDiv"></div>
     <pre id="direction">Joystick Values</pre>
@@ -39,11 +50,10 @@
     </div>
   </div>
 </main>
-<script src="joy.js">
-</script>
-<script src="tankVisualiser.js">
-</script>
-<script src="tankInterface.js">
-</script>
+<script src="joy.js"></script>
+<script src="tankVisualiser.js"></script>
+<script src="socket.js"></script>
+<script src="tankInterface.js"></script>
+<script src="steering.js"></script>
 </body>
 </html>

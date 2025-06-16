@@ -3,170 +3,78 @@ var joyParam = {
     "width": 300,
     "height": 300
 };
-var connectionStatus = false;
-var connectTabButton = document.getElementById('connectTabButton');
+var connectionStatusBar = document.getElementById('connectionStatusBar');
 let refreshRateText = document.getElementById("refreshRateText");
 const status = document.getElementById("status");
 direction = document.getElementById("direction");
 customInput = document.getElementById("customIP");
+customPort  = document.getElementById("customPort");
 connectButton = document.getElementById("connectButton");
 driveValues = document.getElementById("driveValues");
+// scanButton = document.getElementById("scanButton");
 var algorithm = getSteeringAlgorithm();
 Joy = new JoyStick('joyDiv', joyParam);
-// Initialize the default tab
-openTab('driveTab');
+
+
+openTab('connectTab');
+updateDisplay('Disconnected');
 let intervalID;
 const refreshRate = document.getElementById("refreshRate");
-// Call startInterval to initialize with the default refresh rate
 startInterval();
 
-function connect(t) {
-    var url = `ws://${customInput.value}:${customPort.value}`;
-    console.log(`Trying to connect to ${url}`)
-    try {
-        ws = new WebSocket(`${url}`), ws.addEventListener("open", () => {
-            connectionStatus = !0, console.log("We are connected"), updateDisplay()
-        }), ws.addEventListener("close", () => {
-            connectionStatus = !1, console.log("We were disconnected"), updateDisplay()
-        })
-    } catch {
-        console.log("Couldn't connect to " + url)
-    }
-};
 
 function customConnect() {
-    connect(customInput.value)
+    updateDisplay('scanning');
+    connect(customInput.value, customPort.value);
 };
 
-function updateDisplay() {
-    if (connectionStatus === true) {
-        connectTabButton.style.backgroundColor = 'green';
-    } else {
-        connectTabButton.style.backgroundColor = 'red';
+function updateDisplay(status) {
+    if (status === 'Disconnected') {
+        connectionStatusBar.style.backgroundColor = 'grey';
+        connectionStatusBar.innerHTML = 'Disconnected';
+        connectionStatusBar.disabled = true;
+        connectButton.disabled = false;
+        connectButton.onclick = function() { connect(customInput.value, customPort.value); };
+        connectionStatusBar.disabled = true;
+        scanButton.disabled = false;
+        scanButton.onclick = scan;
+        connectionStatusBar.onclick = null;
+    } else if (status === 'Scanning') {
+        connectionStatusBar.style.backgroundColor = 'red';
+        connectionStatusBar.innerHTML = 'Stop scan';
+        connectButton.disabled = true;
+        connectionStatusBar.disabled = false;
+        scanButton.disabled = true;
+        connectionStatusBar.onclick = stopScan;
+    } else if (status === 'Queued'){
+        connectionStatusBar.style.backgroundColor = 'orange';
+        connectionStatusBar.innerHTML = 'Leave queue';
+        connectButton.disabled = true;
+        connectionStatusBar.disabled = false;
+        scanButton.disabled = true;
+        // connectionStatusBar.onclick = leaveQueue;
+    } else if (status === 'Connected') {
+        connectionStatusBar.style.backgroundColor = 'red';
+        connectionStatusBar.innerHTML = 'Disconnect';
+        connectionStatusBar.onclick = disconnect;
+        connectionStatusBar.disabled = false;
+        connectButton.disabled = true;
+        scanButton.disabled = true;
+        openTab('driveTab');
+    }
+    else {
+        console.log('Unknown status: ' + status);
     }
 };
 
-function disconnect() {
-    connectionStatus = false
-    ws.close()
-    updateDisplay()
-};
 
-function clamp(num, min, max) {
-    return Math.min(Math.max(num, min), max);
-};
 
-function compass(x, y) {
-    direction = Joy.GetDir();
-    var powerValues = {
-        C: [0, 0],
-        N: [100, 100],
-        NE: [75, -75],
-        E: [100, -100],
-        SE: [-50, 50],
-        S: [-100, -100],
-        SW: [50, -50],
-        W: [-100, 100],
-        NW: [-75, 75]
-    };
-    left = powerValues[direction][0];
-    right = powerValues[direction][1];
-    return {
-        left,
-        right
-    };
-};
-
-function diffSteer(leftRightAxis, upDownAxis) {
-    axisFlip = -1;
-    maxAxis = 1;
-    maxSpeed = 100; // Set maxSpeed to 100 to represent percentages
-    minAxis = -1;
-    var direction = 0;
-    var leftMotorNoThrottleScale = 0;
-    var leftMotorOutput = 0;
-    var leftMotorScale = 0;
-    var rightMotorNoThrottleTurnScale = 0;
-    var rightMotorOutput = 0;
-    var rightMotorScale = 0;
-    var throttle;
-    // Adjust for the joystick being used
-    leftRightAxis = leftRightAxis / 100;
-    // Invert the Y-axis
-    upDownAxis = -upDownAxis / 100;
-    // Calculate Throttled Steering Motor values
-    direction = leftRightAxis / maxAxis;
-    // Turn with throttle
-    leftMotorScale = upDownAxis * (1 + direction);
-    leftMotorScale = clamp(leftMotorScale, minAxis, maxAxis); // Govern Axis to Minimum and Maximum range
-    rightMotorScale = upDownAxis * (1 - direction);
-    rightMotorScale = clamp(rightMotorScale, minAxis, maxAxis); // Govern Axis to Minimum and Maximum range
-    // Calculate No Throttle Steering Motors values (Turn with little to no throttle)
-    throttle = 1 - Math.abs(upDownAxis / maxAxis); // Throttle inverse magnitude (1 = min, 0 = max)
-    leftMotorNoThrottleScale = -leftRightAxis * throttle;
-    rightMotorNoThrottleTurnScale = leftRightAxis * throttle;
-    // Calculate final motor output values, scale to -100 to 100
-    leftMotorOutput = Math.round((leftMotorScale + leftMotorNoThrottleScale) * axisFlip * maxSpeed);
-    leftMotorOutput = clamp(leftMotorOutput, -maxSpeed, maxSpeed);
-    rightMotorOutput = Math.round((rightMotorScale + rightMotorNoThrottleTurnScale) * axisFlip * maxSpeed);
-    rightMotorOutput = clamp(rightMotorOutput, -maxSpeed, maxSpeed);
-    return {
-        left: leftMotorOutput,
-        right: rightMotorOutput
-    };
-}
-
-function experimental(x, y) {
-    // Define deadzone for joystick
-    const deadzone = 15;
-    // Check if joystick is not all the way forward or all the way back
-    if (y > -99 && y < 99) {
-        // Check if joystick is within deadzone
-        if (Math.abs(x) < deadzone && Math.abs(y) < deadzone) {
-            return {
-                left: 0,
-                right: 0
-            };
-        }
-        // Map x-axis value to left/right speed difference
-        const speedDiff = x * 0.5; // Scale input to appropriate range
-        // Map y-axis value to overall speed
-        const speed = Math.abs(y) * 0.5; // Scale input to appropriate range
-        // Combine values to determine final speed of each track
-        let leftSpeed, rightSpeed;
-        if (speedDiff > 0) {
-            leftSpeed = speed;
-            rightSpeed = speed - speedDiff;
-        } else {
-            leftSpeed = speed + speedDiff;
-            rightSpeed = speed;
-        }
-        // Adjust polarity of speed values based on y-axis direction
-        if (y < 0) {
-            return {
-                left: -Math.floor(leftSpeed),
-                right: -Math.floor(rightSpeed)
-            };
-        } else {
-            return {
-                left: Math.floor(leftSpeed),
-                right: Math.floor(rightSpeed)
-            };
-        }
+function manualConnect() {
+    if (connectionStatus === false) {
+        updateDisplay('scanning');
+        connect(customInput.value, customPort.value); 
     } else {
-        // Joystick is all the way forward or all the way back
-        // Send maximum speed to both tracks in the appropriate direction
-        if (y < 0) {
-            return {
-                left: -100,
-                right: -100
-            };
-        } else {
-            return {
-                left: 100,
-                right: 100
-            };
-        }
+        disconnect();
     }
 };
 
@@ -201,7 +109,7 @@ function getDirection() {
 
 function sendPayload(payload) {
     console.log('sending: ' + payload)
-    ws.send(payload)
+    socket.send(payload)
 };
 
 function openTab(tabName) {
@@ -229,12 +137,11 @@ function startInterval() {
         motorInputPayload = JSON.stringify(motorInputs);
         driveValues.innerHTML = motorInputPayload;
         direction.innerHTML = JSON.stringify(directions);
-        if (connectionStatus === true) {
+        if (connectionStatus === 'Connected') {
             sendPayload(motorInputPayload);
         }
         updateCanvas(motorInputs.right, 'rightTrack');
         updateCanvas(motorInputs.left, 'leftTrack');
     }, parseInt(refreshRate.value));
-    // Update the label text with the current refresh rate
     refreshRateText.textContent = `Refresh rate: ${refreshRate.value} ms`;
 }

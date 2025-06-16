@@ -145,3 +145,11 @@ html, body {
   transform: translate(-50%, -50%);
   /* Center the element within the container */
 }
+
+/* Disabled state styling for Scan Network and Connect buttons */
+#scanButton:disabled,
+#connectButton:disabled {
+    background-color: #cccccc !important;
+    color: #666666 !important;
+    cursor: not-allowed;
+}
