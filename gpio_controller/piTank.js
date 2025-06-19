@@ -67,7 +67,7 @@ function acceptClient(ws) {
     isConnected = true;
     currentClient = ws;
     console.log("New client connected");
-    ws.send(JSON.stringify({ status: "Connected" }));
+    ws.send(JSON.stringify({ status: "connected" }));
     let clientTimeoutId;
 
     ws.on("message", data => {

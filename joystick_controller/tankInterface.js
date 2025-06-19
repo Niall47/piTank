@@ -11,8 +11,8 @@ customInput = document.getElementById("customIP");
 customPort  = document.getElementById("customPort");
 connectButton = document.getElementById("connectButton");
 driveValues = document.getElementById("driveValues");
-// scanButton = document.getElementById("scanButton");
 var algorithm = getSteeringAlgorithm();
+logContent = document.getElementById("logContent");
 Joy = new JoyStick('joyDiv', joyParam);
 
 
@@ -30,6 +30,7 @@ function customConnect() {
 
 function updateDisplay(status) {
     if (status === 'Disconnected') {
+        console.log('setting status to Disconnected');
         connectionStatusBar.style.backgroundColor = 'grey';
         connectionStatusBar.innerHTML = 'Disconnected';
         connectionStatusBar.disabled = true;
@@ -40,6 +41,7 @@ function updateDisplay(status) {
         scanButton.onclick = scan;
         connectionStatusBar.onclick = null;
     } else if (status === 'Scanning') {
+        console.log('setting status to Scanning');
         connectionStatusBar.style.backgroundColor = 'red';
         connectionStatusBar.innerHTML = 'Stop scan';
         connectButton.disabled = true;
@@ -47,13 +49,17 @@ function updateDisplay(status) {
         scanButton.disabled = true;
         connectionStatusBar.onclick = stopScan;
     } else if (status === 'Queued'){
+        console.log('setting status to Queued');
         connectionStatusBar.style.backgroundColor = 'orange';
         connectionStatusBar.innerHTML = 'Leave queue';
-        connectButton.disabled = true;
+        connectionStatusBar.onclick = disconnect;
         connectionStatusBar.disabled = false;
+        connectButton.disabled = true;
         scanButton.disabled = true;
-        // connectionStatusBar.onclick = leaveQueue;
+        connectionStatusBar.onclick = disconnect;
+        openTab('connectTab');
     } else if (status === 'Connected') {
+        console.log('setting status to Connected');
         connectionStatusBar.style.backgroundColor = 'red';
         connectionStatusBar.innerHTML = 'Disconnect';
         connectionStatusBar.onclick = disconnect;

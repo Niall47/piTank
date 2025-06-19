@@ -7,7 +7,9 @@ let socket;
 
 
 function disconnect() {
-    if (connectionStatus === 'Connected') {
+    if (connectionStatus === 'Connected' 
+        || connectionStatus === 'Queued'
+    ) {
         console.log('Disconnecting from WebSocket');
         connectionStatus = 'Disconnected';
         updateDisplay(connectionStatus);
@@ -35,6 +37,43 @@ function connect(ip = '192.168.0.20', port = '8081') {
 
         socket.onmessage = function(event) {
             console.log('Message from server:', event.data);
+            try {
+                const data = JSON.parse(event.data);
+                if (data.status === 'queued') {
+                    connectionStatus = 'Queued';
+                    console.log('Connected to ip:', data.ip, 'Port:', data.port);
+                    console.log('Status: ', data.status, 'Position in queue:', data.position);
+                    updateDisplay(connectionStatus);
+                } else if (data.status === 'queue_update') {
+                    console.log('Queue update:', data.position);
+                }else if (data.status === 'connected') {
+                    connectionStatus = 'Connected';
+                    console.log('Connected to ip:', data.ip, 'Port:', data.port);
+                    console.log('Status: ', data.status);
+                    updateDisplay(connectionStatus);
+                } else if (data.status === 'disconnected') {
+                    connectionStatus = 'Disconnected';
+                    console.log('Disconnected from :', data.ip, 'Port:', data.port);
+                    updateDisplay(connectionStatus);                
+                } else {
+                    console.log('Unknown JSON message from server:', event.data);
+                }
+            } catch (e) {
+                if (event.data === 'connected') {
+                    connectionStatus = 'Connected';
+                    console.log('Connected to ip:', data.ip, 'Port:', data.port);
+                    console.log('Status: ', event.data);
+                    updateDisplay(connectionStatus);
+                }
+                else if (event.data === 'disconnected') {
+                    connectionStatus = 'Disconnected';
+                    console.log('Disconnected from :', ip, 'Port:', port);
+                    updateDisplay(connectionStatus);
+                }
+                else {
+                    console.log('Unknown message from server:', event.data);
+                }
+            }
         };
     }
 
@@ -71,6 +110,8 @@ function scan() {
             scanSockets = [];
             socket = ws;
             connectionStatus = 'Connected';
+            customIPut.value = ip;
+            customPort.value = defaultPort;
             updateDisplay(connectionStatus);
         })
         .catch(() => {
