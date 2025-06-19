@@ -1,7 +1,7 @@
-
 const disconnectButton = document.getElementById('disconnectButton');
 const scanButton = document.getElementById('scanButton');
 const stopScanButton = document.getElementById('stopScanButton');
+let piTankIP = null;
 let socket;
 
 
@@ -10,7 +10,7 @@ function disconnect() {
     if (connectionStatus === 'Connected' 
         || connectionStatus === 'Queued'
     ) {
-        console.log('Disconnecting from WebSocket');
+        console.log('Disconnecting from ip:', customInput.value, 'Port:', customPort.value   );
         connectionStatus = 'Disconnected';
         updateDisplay(connectionStatus);
         socket.close();
@@ -23,11 +23,14 @@ function connect(ip = '192.168.0.20', port = '8081') {
 
         socket.onopen = function() {
             connectionStatus = 'Connected';
+            piTankIP = ip + ':' + port;
+            sendLog('Connected to ' + ip + ':' + port);
             updateDisplay(connectionStatus);
         };
 
         socket.onclose = function() {
             connectionStatus = 'Disconnected';
+            sendLog('Disconnected from ' + ip + ':' + port);
             updateDisplay(connectionStatus);
         };
 
@@ -41,19 +44,17 @@ function connect(ip = '192.168.0.20', port = '8081') {
                 const data = JSON.parse(event.data);
                 if (data.status === 'queued') {
                     connectionStatus = 'Queued';
-                    console.log('Connected to ip:', data.ip, 'Port:', data.port);
-                    console.log('Status: ', data.status, 'Position in queue:', data.position);
+                    sendLog('Queued—position: ' + data.position);
                     updateDisplay(connectionStatus);
                 } else if (data.status === 'queue_update') {
-                    console.log('Queue update:', data.position);
+                    sendLog('Queue update—new position: ' + data.position); 
                 }else if (data.status === 'connected') {
                     connectionStatus = 'Connected';
-                    console.log('Connected to ip:', data.ip, 'Port:', data.port);
-                    console.log('Status: ', data.status);
+                    sendLog('Server says connected');
                     updateDisplay(connectionStatus);
                 } else if (data.status === 'disconnected') {
                     connectionStatus = 'Disconnected';
-                    console.log('Disconnected from :', data.ip, 'Port:', data.port);
+                    sendLog('Server disconnected'); 
                     updateDisplay(connectionStatus);                
                 } else {
                     console.log('Unknown JSON message from server:', event.data);
@@ -86,6 +87,7 @@ const baseIp = '192.168.0.';
 
 function scan() {
     if (connectionStatus !== 'Disconnected') return;
+    sendLog('Starting network scan...');
     scanning = true;
     connectionStatus = 'Scanning';
     updateDisplay(connectionStatus);
@@ -96,6 +98,7 @@ function scan() {
         const ws = new WebSocket(`ws://${ip}:${defaultPort}`);
         scanSockets.push(ws);
         ws.onopen = () => {
+            socket = ws;
             if (scanning) resolve({ip, ws});
             else { ws.close(); reject(); }
         };
@@ -105,6 +108,7 @@ function scan() {
 
     Promise.any(connectPromises)
         .then(({ip, ws}) => {
+            sendLog('Found host at ' + ip);
             scanning = false;
             scanSockets.forEach(s => s !== ws && s.close());
             scanSockets = [];
@@ -112,13 +116,25 @@ function scan() {
             connectionStatus = 'Connected';
             customIPut.value = ip;
             customPort.value = defaultPort;
+            sendLog('Connected to ' + ip + ':' + defaultPort);
             updateDisplay(connectionStatus);
         })
         .catch(() => {
-            scanSockets.forEach(s => s.close());
-            scanSockets = [];
-            scanning = false;
-            connectionStatus = 'Disconnected';
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                // We need to check if the socket has the message we are connected or in the queue
+                
+
+                connectionStatus = 'Connected';
+                sendLog('Connected to ' + piTankIP);
+            } else {
+                connectionStatus = 'Disconnected';
+                sendLog('No hosts found');
+                scanSockets.forEach(s => s.close());
+                scanSockets = [];
+                scanning = false;
+                connectionStatus = 'Disconnected';
+            }
+
             updateDisplay(connectionStatus);
         });
 }
@@ -129,6 +145,7 @@ function stopScan() {
     scanSockets.forEach(s => s.close());
     scanSockets = [];
     connectionStatus = 'Disconnected';
+    sendLog('Scan stopped');
     updateDisplay(connectionStatus);
 }
 

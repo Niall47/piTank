@@ -25,7 +25,13 @@ startInterval();
 
 function customConnect() {
     updateDisplay('scanning');
+    sendLog('Connecting to ' + customInput.value + ':' + customPort.value);
     connect(customInput.value, customPort.value);
+};
+
+function sendLog(message) {
+    logContent.innerHTML += message + '<br>';
+    logContent.scrollTop = logContent.scrollHeight;
 };
 
 function updateDisplay(status) {

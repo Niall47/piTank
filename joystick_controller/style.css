@@ -153,3 +153,22 @@ html, body {
     color: #666666 !important;
     cursor: not-allowed;
 }
+
+#logBlock {
+    overflow-y: auto;          /* vertical scrollbar when needed */
+    background-color: #fff;    /* white background */
+    border: 1px solid #ccc;    /* light border */
+    padding: 10px;             /* inner spacing */
+}
+
+#logBlock h4 {
+    margin: 0 0 8px;           /* tighten header spacing */
+    font-size: 1.1em;
+}
+
+.logContent, #logContent {
+    font-family: monospace;    /* fixed-width for logs */
+    font-size: 0.9em;
+    white-space: pre-wrap;     /* preserve line breaks */
+    word-break: break-word;
+}
