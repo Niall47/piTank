@@ -41,7 +41,7 @@ function updateDisplay(status) {
         connectionStatusBar.innerHTML = 'Disconnected';
         connectionStatusBar.disabled = true;
         connectButton.disabled = false;
-        connectButton.onclick = function() { connect(customInput.value, customPort.value); };
+        connectButton.onclick = function() { scan(targetIp=customInput.value, targetPort=customPort.value); };
         connectionStatusBar.disabled = true;
         scanButton.disabled = false;
         scanButton.onclick = scan;

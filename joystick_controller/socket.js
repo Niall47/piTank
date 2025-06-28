@@ -1,6 +1,7 @@
 const disconnectButton = document.getElementById('disconnectButton');
 const scanButton = document.getElementById('scanButton');
 const stopScanButton = document.getElementById('stopScanButton');
+let connectionStatus = 'Disconnected';
 let piTankIP = null;
 let socket;
 
@@ -85,17 +86,28 @@ let scanSockets = [];
 const defaultPort = '8081';
 const baseIp = '192.168.0.';
 
-function scan() {
+function scan(targetIp = null, targetPort = null) {
     if (connectionStatus !== 'Disconnected') return;
-    sendLog('Starting network scan...');
+    
+    if (targetIp && targetPort) {
+        sendLog(`Connecting to ${targetIp}:${targetPort}...`);
+    } else {
+        sendLog('Starting network scan...');
+    }
+    
     scanning = true;
     connectionStatus = 'Scanning';
     updateDisplay(connectionStatus);
-
-    const ips = Array.from({length:254}, (_,i)=> baseIp + (i+1));
+    
+    const ips = targetIp && targetPort
+        ? [`ws://${targetIp}:${targetPort}`]
+        : Array.from({length: 254}, (_, i) => `ws://${baseIp}${i + 1}:${defaultPort}`);
+    
+    console.log('Scanning IPs:', ips);
+    
     const connectPromises = ips.map(ip => new Promise((resolve, reject) => {
         if (!scanning) return reject();
-        const ws = new WebSocket(`ws://${ip}:${defaultPort}`);
+        const ws = new WebSocket(ip);
         scanSockets.push(ws);
         ws.onopen = () => {
             socket = ws;
@@ -104,6 +116,46 @@ function scan() {
         };
         ws.onerror = () => { ws.close(); reject(); };
         ws.onclose = () => { reject(); };
+        
+        // Add message handling from connect function
+        ws.onmessage = function(event) {
+            console.log('Message from server:', event.data);
+            try {
+                const data = JSON.parse(event.data);
+                if (data.status === 'queued') {
+                    connectionStatus = 'Queued';
+                    sendLog('Queued—position: ' + data.position);
+                    updateDisplay(connectionStatus);
+                } else if (data.status === 'queue_update') {
+                    sendLog('Queue update—new position: ' + data.position); 
+                }else if (data.status === 'connected') {
+                    connectionStatus = 'Connected';
+                    sendLog('Server says connected');
+                    updateDisplay(connectionStatus);
+                } else if (data.status === 'disconnected') {
+                    connectionStatus = 'Disconnected';
+                    sendLog('Server disconnected'); 
+                    updateDisplay(connectionStatus);                
+                } else {
+                    console.log('Unknown JSON message from server:', event.data);
+                }
+            } catch (e) {
+                if (event.data === 'connected') {
+                    connectionStatus = 'Connected';
+                    console.log('Connected to ip:', event.data);
+                    console.log('Status: ', event.data);
+                    updateDisplay(connectionStatus);
+                }
+                else if (event.data === 'disconnected') {
+                    connectionStatus = 'Disconnected';
+                    console.log('Disconnected from:', ip);
+                    updateDisplay(connectionStatus);
+                }
+                else {
+                    console.log('Unknown message from server:', event.data);
+                }
+            }
+        };
     }));
 
     Promise.any(connectPromises)
@@ -121,8 +173,6 @@ function scan() {
         })
         .catch(() => {
             if (socket && socket.readyState === WebSocket.OPEN) {
-                // We need to check if the socket has the message we are connected or in the queue
-                
 
                 connectionStatus = 'Connected';
                 sendLog('Connected to ' + piTankIP);
@@ -134,7 +184,6 @@ function scan() {
                 scanning = false;
                 connectionStatus = 'Disconnected';
             }
-
             updateDisplay(connectionStatus);
         });
 }
@@ -149,4 +198,4 @@ function stopScan() {
     updateDisplay(connectionStatus);
 }
 
-let connectionStatus = 'Disconnected';
+
