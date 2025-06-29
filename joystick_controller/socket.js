@@ -4,8 +4,10 @@ const stopScanButton = document.getElementById('stopScanButton');
 let connectionStatus = 'Disconnected';
 let piTankIP = null;
 let socket;
-
-
+let scanning = false;
+let scanSockets = [];
+const defaultPort = '8081';
+const baseIp = '192.168.0.';
 
 function disconnect() {
     if (connectionStatus === 'Connected' 
@@ -17,12 +19,6 @@ function disconnect() {
         socket.close();
     }
 };
-
-
-let scanning = false;
-let scanSockets = [];
-const defaultPort = '8081';
-const baseIp = '192.168.0.';
 
 function scan(targetIp = null, targetPort = null) {
     if (connectionStatus !== 'Disconnected') return;
@@ -48,9 +44,16 @@ function scan(targetIp = null, targetPort = null) {
         const ws = new WebSocket(ip);
         scanSockets.push(ws);
         ws.onopen = () => {
+            console.log('Connected to:', ip);
             socket = ws;
-            if (scanning) resolve({ip, ws});
-            else { ws.close(); reject(); }
+            if (scanning)
+                {scanning = false;
+                scanSockets.forEach(s => {
+                    if (s !== ws) s.close();
+                });
+                scanSockets = [ws];}
+                else { ws.close(); reject(); }
+                resolve({ip, ws})
         };
         ws.onerror = () => { ws.close(); reject(); };
         ws.onclose = () => { reject(); };
@@ -95,20 +98,6 @@ function scan(targetIp = null, targetPort = null) {
     }));
 
     Promise.any(connectPromises)
-        .catch(() => {
-            if (socket && socket.readyState === WebSocket.OPEN) {
-                connectionStatus = 'Connected';
-                sendLog('Connected to ' + piTankIP);
-            } else {
-                connectionStatus = 'Disconnected';
-                sendLog('No hosts found');
-                scanSockets.forEach(s => s.close());
-                scanSockets = [];
-                scanning = false;
-                connectionStatus = 'Disconnected';
-            }
-            updateDisplay(connectionStatus);
-        });
 }
 
 function stopScan() {
@@ -119,6 +108,4 @@ function stopScan() {
     connectionStatus = 'Disconnected';
     sendLog('Scan stopped');
     updateDisplay(connectionStatus);
-}
-
-
+};
