@@ -1,7 +1,46 @@
+// Global variables for backward compatibility
+var algorithm = 'diffsteer';
+var intervalID = null;
+var Joy = null;
+
 function changeSteeringAlgorithm() {
-    algorithm = getSteeringAlgorithm();
-    sendLog("Changed to " + algorithm);
-};
+    if (joystickHandler) {
+        joystickHandler.updateFromRadioButton();
+    } else {
+        algorithm = getSteeringAlgorithm();
+        sendLog("Changed to " + algorithm);
+    }
+}
+
+function rateUpdate() {
+    if (joystickHandler) {
+        joystickHandler.updateRefreshRate();
+    } else {
+        clearInterval(intervalID);
+        startInterval();
+    }
+}
+
+function startInterval() {
+    if (joystickHandler) {
+        joystickHandler.startInterval();
+        return;
+    }
+    
+    intervalID = setInterval(function() {
+        let directions = getDirection();
+        motorInputs = getMotorInputs(directions.X, directions.Y);
+        motorInputPayload = JSON.stringify(motorInputs);
+        driveValues.innerHTML = motorInputPayload;
+        direction.innerHTML = JSON.stringify(directions);
+        if (connectionStatus === 'Connected') {
+            sendPayload(motorInputPayload);
+        }
+        updateCanvas(motorInputs.right, 'rightTrack');
+        updateCanvas(motorInputs.left, 'leftTrack');
+    }, parseInt(refreshRate.value));
+    refreshRateText.textContent = `Refresh rate: ${refreshRate.value} ms`;
+}
 
 function getSteeringAlgorithm() {
     return document.querySelector('input[name="algorithm"]:checked').id;
@@ -19,16 +58,16 @@ function getMotorInputs(x, y) {
 };
 
 function getDirection() {
-    joyX = Joy.GetX();
-    joyY = Joy.GetY();
-    return {
-        X: joyX,
-        Y: joyY
-    };
+    if (Joy) {
+        joyX = Joy.GetX();
+        joyY = Joy.GetY();
+        return {
+            X: joyX,
+            Y: joyY
+        };
+    }
+    return { X: 0, Y: 0 };
 };
-
-
-
 
 function clamp(num, min, max) {
     return Math.min(Math.max(num, min), max);
