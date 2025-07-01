@@ -30,20 +30,21 @@
     <br>
     <h4>or</h4>
     <br>
-    <div class="form-floating">
-      <input class="form-control" id="customIP" type="text" value="192.168.0.20"> <label for="customIP">IP</label>
+    <div class="url-input-container">
+      <span class="url-prefix">ws://</span>
+      <input class="form-control ip-input" id="customIP" type="text" value="192.168.0.20" placeholder="IP Address">
+      <span class="url-separator">:</span>
+      <input class="form-control port-input" id="customPort" type="text" value="8081" placeholder="Port">
     </div>
-    <div class="form-floating">
-      <input class="form-control" id="customPort" type="text" value="8081"> <label for="customPort">Port</label>
-    </div>
+    <br>
     <button class="btn btn-secondary" id="connectButton" type="submit">Connect</button>
   </div>
   <br><hr><br>
-  <div class="form-floating">
-    <div class="form-control" id="logBlock">
+  <div class="logs-section">
+    <div id="logBlock">
       <h4>Logs</h4>
       <div id="logContent" class="logContent"></div>
-  </div>
+    </div>
   </div>
 </div>
 

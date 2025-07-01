@@ -1,6 +1,6 @@
 function changeSteeringAlgorithm() {
     algorithm = getSteeringAlgorithm();
-    console.log("Changed to " + algorithm);
+    sendLog("Changed to " + algorithm);
 };
 
 function getSteeringAlgorithm() {

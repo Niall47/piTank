@@ -154,16 +154,49 @@ html, body {
     cursor: not-allowed;
 }
 
+.url-input-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.url-prefix, .url-separator {
+    font-weight: bold;
+    color: #333;
+    font-size: 16px;
+}
+
+.ip-input {
+    flex: 1;
+    max-width: 150px;
+}
+
+.port-input {
+    flex: 0 0 80px;
+}
+
+.logs-section {
+    width: 100%;
+    margin-top: 20px;
+}
+
 #logBlock {
     overflow-y: auto;          /* vertical scrollbar when needed */
     background-color: #fff;    /* white background */
     border: 1px solid #ccc;    /* light border */
     padding: 10px;             /* inner spacing */
+    height: 200px;             /* fixed height for better expansion */
+    min-height: 150px;         /* minimum height */
+    max-height: 300px;         /* maximum height */
+    text-align: left;          /* left align log text */
 }
 
 #logBlock h4 {
     margin: 0 0 8px;           /* tighten header spacing */
     font-size: 1.1em;
+    text-align: center;        /* center the title */
 }
 
 .logContent, #logContent {
@@ -171,4 +204,6 @@ html, body {
     font-size: 0.9em;
     white-space: pre-wrap;     /* preserve line breaks */
     word-break: break-word;
+    height: calc(100% - 30px); /* take full height minus title */
+    overflow-y: auto;          /* scroll within content area */
 }

@@ -32,11 +32,12 @@ function customConnect() {
 function sendLog(message) {
     logContent.innerHTML += message + '<br>';
     logContent.scrollTop = logContent.scrollHeight;
+    console.log(message);
 };
 
 function updateDisplay(status) {
     if (status === 'Disconnected') {
-        console.log('setting status to Disconnected');
+        sendLog('setting status to Disconnected');
         connectionStatusBar.style.backgroundColor = 'grey';
         connectionStatusBar.innerHTML = 'Disconnected';
         connectionStatusBar.disabled = true;
@@ -47,7 +48,7 @@ function updateDisplay(status) {
         scanButton.onclick = scan;
         connectionStatusBar.onclick = null;
     } else if (status === 'Scanning') {
-        console.log('setting status to Scanning');
+        sendLog('setting status to Scanning');
         connectionStatusBar.style.backgroundColor = 'red';
         connectionStatusBar.innerHTML = 'Stop scan';
         connectButton.disabled = true;
@@ -55,7 +56,7 @@ function updateDisplay(status) {
         scanButton.disabled = true;
         connectionStatusBar.onclick = stopScan;
     } else if (status === 'Queued'){
-        console.log('setting status to Queued');
+        sendLog('setting status to Queued');
         connectionStatusBar.style.backgroundColor = 'orange';
         connectionStatusBar.innerHTML = 'Leave queue';
         connectionStatusBar.onclick = disconnect;
@@ -65,17 +66,23 @@ function updateDisplay(status) {
         connectionStatusBar.onclick = disconnect;
         openTab('connectTab');
     } else if (status === 'Connected') {
-        console.log('setting status to Connected');
+        sendLog('setting status to Connected');
         connectionStatusBar.style.backgroundColor = 'red';
         connectionStatusBar.innerHTML = 'Disconnect';
         connectionStatusBar.onclick = disconnect;
         connectionStatusBar.disabled = false;
         connectButton.disabled = true;
         scanButton.disabled = true;
+        const urlParts = socket.url.split('/');
+        const hostPort = urlParts[2];
+        const [ip, port] = hostPort.split(':');
+        customIP.value = ip;
+        customPort.value = port ? port.replace(/\/$/, '') : '';
+        customPort.value = socket.url.split(':')[2].replace(/\/$/, '');
         openTab('driveTab');
     }
     else {
-        console.log('Unknown status: ' + status);
+        sendLog('Unknown status: ' + status);
     }
 };
 
@@ -92,7 +99,7 @@ function manualConnect() {
 
 function changeSteeringAlgorithm() {
     algorithm = getSteeringAlgorithm();
-    console.log("Changed to " + algorithm);
+    sendLog("Changed to " + algorithm);
 };
 
 function getSteeringAlgorithm() {
@@ -120,7 +127,7 @@ function getDirection() {
 };
 
 function sendPayload(payload) {
-    console.log('sending: ' + payload)
+    // sendLog('sending: ' + payload)
     socket.send(payload)
 };
 

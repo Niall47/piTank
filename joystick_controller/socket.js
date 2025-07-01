@@ -13,7 +13,8 @@ function disconnect() {
     if (connectionStatus === 'Connected' 
         || connectionStatus === 'Queued'
     ) {
-        console.log('Disconnecting from ip:', customInput.value, 'Port:', customPort.value   );
+        sendLog('Disconnecting from ' + socket.url);
+        sendLog('Disconnecting from ip: ' + customInput.value + ' Port: ' + customPort.value);
         connectionStatus = 'Disconnected';
         updateDisplay(connectionStatus);
         socket.close();
@@ -37,28 +38,27 @@ function scan(targetIp = null, targetPort = null) {
         ? [`ws://${targetIp}:${targetPort}`]
         : Array.from({length: 254}, (_, i) => `ws://${baseIp}${i + 1}:${defaultPort}`);
     
-    console.log('Scanning IPs:', ips);
+    sendLog('Scanning IPs: ' + ips.length + ' addresses');
     
     const connectPromises = ips.map(ip => new Promise((resolve, reject) => {
         if (!scanning) return reject();
         const ws = new WebSocket(ip);
         scanSockets.push(ws);
         ws.onopen = () => {
-            console.log('Connected to:', ip);
+            sendLog('Connected to: ' + ip);
             socket = ws;
             if (scanning)
                 {scanning = false;
                 scanSockets.forEach(s => {
                     if (s !== ws) s.close();
                 });
-                scanSockets = [ws];}
-                else { ws.close(); reject(); }
-                resolve({ip, ws})
+            scanSockets = [ws];}
+            else { ws.close(); reject(); }
+            resolve({ip, ws})
         };
         ws.onerror = () => { ws.close(); reject(); };
         ws.onclose = () => { reject(); };
         ws.onmessage = function(event) {
-            console.log('Message from server:', event.data);
             try {
                 const data = JSON.parse(event.data);
                 if (data.status === 'queued') {
@@ -76,28 +76,31 @@ function scan(targetIp = null, targetPort = null) {
                     sendLog('Server disconnected'); 
                     updateDisplay(connectionStatus);                
                 } else {
-                    console.log('Unknown JSON message from server:', event.data);
+                    sendLog('Unknown JSON message from server: ' + event.data);
                 }
             } catch (e) {
-                if (event.data === 'connected') {
-                    connectionStatus = 'Connected';
-                    console.log('Connected to ip:', event.data);
-                    console.log('Status: ', event.data);
-                    updateDisplay(connectionStatus);
-                }
-                else if (event.data === 'disconnected') {
-                    connectionStatus = 'Disconnected';
-                    console.log('Disconnected from:', ip);
-                    updateDisplay(connectionStatus);
-                }
-                else {
-                    console.log('Unknown message from server:', event.data);
-                }
+                sendLog('Error parsing JSON message: ' + e + ' Data: ' + event.data);   
             }
         };
     }));
-
     Promise.any(connectPromises)
+        .then((result) => {
+            scanning = false;
+            sendLog('Successfully connected to: ' + result.ip);
+        })
+        .catch((error) => {
+            sendLog('All connection attempts failed: ' + error);
+            scanning = false;
+            scanSockets.forEach(s => s.close());
+            scanSockets = [];
+            connectionStatus = 'Disconnected';
+            if (targetIp && targetPort) {
+                sendLog(`Failed to connect to ${targetIp}:${targetPort}`);
+            } else {
+                sendLog('Network scan completed - no devices found');
+            }
+            updateDisplay(connectionStatus);
+        });
 }
 
 function stopScan() {
