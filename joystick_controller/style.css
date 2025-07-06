@@ -26,6 +26,35 @@ body {
     border-bottom: 2px solid #4CAF50;
 }
 
+.statusBar {
+    background-color: #333;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.statusBar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.statusBar-content p {
+    margin: 0;
+    flex: 1;
+    text-align: left;
+}
+
+#connectionStatus {
+    color: #4CAF50;
+    font-weight: bold;
+    margin-right: 20px;
+}
+#disconnectButton {
+    margin: 0;
+}
+
 .ui-tabs-nav li {
     margin-right: 10px;
 }

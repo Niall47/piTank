@@ -4,8 +4,7 @@ var joyParam = {
     "height": 300
 };
 
-// DOM element references
-var connectionStatusBar = document.getElementById('connectionStatusBar');
+
 const status = document.getElementById("status");
 customInput = document.getElementById("customIP");
 customPort = document.getElementById("customPort");
@@ -34,5 +33,3 @@ function sendLog(message) {
         console.error('Error logging message:', error);
     }
 }
-
-// Remove duplicate functions - they now exist in ui.js and joystickHandler.js
