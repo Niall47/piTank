@@ -12,10 +12,14 @@ function openTab(tabName) {
 }
 
 function sendLog(message) {
+    if (!message) return;
     logContent.innerHTML += message + '<br>';
     logContent.scrollTop = logContent.scrollHeight;
-    console.log(message);
-}
+};
+
+function clearLogs() {
+    logContent.innerHTML = '';
+};
 
 function updateDisplay(status) {
     if (status === 'Disconnected') {

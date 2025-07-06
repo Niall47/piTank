@@ -30,7 +30,6 @@ function sendLog(message) {
     try {
         logContent.innerHTML += message + '<br>';
         logContent.scrollTop = logContent.scrollHeight;
-        console.log(message);
     } catch (error) {
         console.error('Error logging message:', error);
     }

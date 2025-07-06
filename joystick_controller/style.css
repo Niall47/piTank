@@ -1,209 +1,370 @@
-/* Updated CSS */
-
-html, body {
-  height: 100%;
+/* General Styles */
+body {
+  font-family: 'Roboto', sans-serif; /* Clean sans-serif font */
+  background: linear-gradient(180deg, #121212, #1e1e1e); /* Modern dark theme */
+  color: #ffffff;
   margin: 0;
   padding: 0;
-  font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
 }
-.pi-tank {
-  width: 100%;
-  max-width: 330px;
-  padding: 15px;
-  margin: auto;
-}
-.pi-tank .checkbox {
-  font-weight: 400;
-}
-.pi-tank .form-floating:focus-within {
-  z-index: 2;
-}
-.bd-placeholder-img {
-  font-size: 1.125rem;
-  text-anchor: middle;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
-}
-@media (min-width: 768px) {
-  .bd-placeholder-img-lg {
-    font-size: 3.5rem;
-  }
-}
-/* The container */
 
-.container {
-  display: block;
-  position: relative;
-  padding-left: 35px;
-  margin-bottom: 12px;
-  cursor: pointer;
-  font-size: 22px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+/* Main container */
+#tabs {
+    width: 95%;
+    max-width: 1200px;
+    margin: 0 auto;
+    border: none;
+    background: none;
 }
-/* Hide the browser's default radio button */
 
-.container input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
+/* Tab Navigation */
+.ui-tabs-nav {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+    display: flex;
+    justify-content: center;
+    border-bottom: 2px solid #4CAF50;
 }
-/* Create a custom radio button */
 
-.checkmark {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 25px;
-  width: 25px;
-  background-color: #eee;
-  border-radius: 50%;
+.ui-tabs-nav li {
+    margin-right: 10px;
 }
-/* On mouse-over, add a grey background color */
 
-.container:hover input~.checkmark {
-  background-color: #ccc;
+.ui-tabs-nav a {
+    text-decoration: none;
+    color: #ffffff;
+    padding: 12px 25px;
+    display: block;
+    border-radius: 4px;
+    background-color: #333;
+    transition: background-color 0.3s, color 0.3s;
+    font-weight: 600;
 }
-/* When the radio button is checked, add a blue background */
 
-.container input:checked~.checkmark {
-  background-color: #2196F3;
+.ui-tabs-nav a:hover {
+    background-color: #4CAF50;
+    color: #ffffff;
 }
-/* Create the indicator (the dot/circle - hidden when not checked) */
 
-.checkmark:after {
-  content: "";
-  position: absolute;
-  display: none;
+.ui-tabs-nav .ui-tabs-active a {
+    background-color: #4CAF50;
+    color: #ffffff;
 }
-/* Show the indicator (dot/circle) when checked */
 
-.container input:checked~.checkmark:after {
-  display: block;
+/* Tab Panels */
+.ui-tabs-panel {
+    background-color: #1e1e1e;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
-/* Style the indicator (dot/circle) */
 
-.container .checkmark:after {
-  top: 9px;
-  left: 9px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: white;
+/* Section Headers */
+h2 {
+    color: #4CAF50;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+    margin-top: 0;
 }
-/* Style for the tab buttons */
 
-.tabButton {
-  background-color: #f5f5f5;
+/* Flexbox layout for tab content */
+.tab-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.column {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.panel {
+    background-color: #2a2a2a;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+/* Specific element styling */
+#joystick {
+    width: 200px;
+    height: 200px;
+    border: none;
+    margin: 20px auto;
+    position: relative; /* Required by nipplejs */
+}
+
+#camera-stream, #lidar-canvas, #map-canvas {
+    border: 1px solid #333;
+    border-radius: 4px;
+    background-color: #000;
+    width: 100%;
+    height: auto;
+}
+
+#map-canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Buttons and Controls */
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+button {
+  border-radius: 8px; /* Rounded corners */
+  padding: 10px 20px; /* Increased padding */
+  font-size: 1rem; /* Slightly larger font size */
   border: none;
-  color: #000;
-  padding: 10px 20px;
   cursor: pointer;
-  font-weight: 600;
-}
-.tabButton.active {
-  background-color: #2196F3;
-  color: #fff;
-}
-/* Style for the tab content */
-
-.tabContent {
-  display: none;
-  padding: 20px;
-  position: absolute;
-  top: 50px;
-  /* Adjust as needed */
-  left: 50%;
-  /* Center horizontally */
-  transform: translateX(-50%);
-  background-color: #f5f5f5;
-}
-.tabContent.active {
-  display: block;
-}
-.joystick-container {
-  position: relative;
-  width: 200px;
-  /* Adjust as needed */
-  height: 200px;
-  /* Adjust as needed */
-}
-.joystick-handle {
-  position: absolute;
-  width: 50px;
-  /* Adjust as needed */
-  height: 50px;
-  /* Adjust as needed */
-  left: 50%;
-  /* Move left by 50% of the container's width */
-  top: 50%;
-  /* Move top by 50% of the container's height */
-  transform: translate(-50%, -50%);
-  /* Center the element within the container */
+  transition: background-color 0.3s ease; /* Smooth hover effect */
 }
 
-/* Disabled state styling for Scan Network and Connect buttons */
-#scanButton:disabled,
-#connectButton:disabled {
-    background-color: #cccccc !important;
-    color: #666666 !important;
-    cursor: not-allowed;
+button:hover {
+  filter: brightness(1.2); /* Slightly lighter shade on hover */
 }
 
+button:active {
+    background-color: #3e8e41;
+}
+
+button.connect {
+    background-color: #198754;
+    color: #ffffff;
+}
+
+button.connect:hover {
+    background-color: #157347;
+}
+
+button.disconnect {
+    background-color: #dc3545;
+    color: #ffffff;
+}
+
+button.disconnect:hover {
+    background-color: #bb2d3b;
+}
+
+button.inactive {
+  background-color: #6c757d; /* Gray for inactive states */
+  color: #ffffff;
+}
+
+/* Input Fields */
 .url-input-container {
     display: flex;
     align-items: center;
+    gap: 5px;
     justify-content: center;
-    gap: 8px;
-    margin-bottom: 15px;
+}
+
+.ip-input, .port-input {
+    width: 150px;
+    padding: 10px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    font-size: 14px;
 }
 
 .url-prefix, .url-separator {
-    font-weight: bold;
-    color: #333;
+    color: #e0e0e0;
     font-size: 16px;
 }
 
-.ip-input {
-    flex: 1;
-    max-width: 150px;
-}
-
-.port-input {
-    flex: 0 0 80px;
-}
-
+/* Logs Section */
 .logs-section {
-    width: 100%;
+    background-color: #2a2a2a;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.logs {
+  background-color: #222222;
+  border: 1px solid #444444;
+  border-radius: 5px;
+  padding: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.logs-container {
+  max-height: 300px; /* Fixed height to prevent overflow */
+  overflow-y: auto;
+  border: 1px solid #333333; /* Border for separation */
+  background-color: #1e1e1e; /* Background color for separation */
+  padding: 10px;
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle box shadow */
+}
+
+#logContent {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #333;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #1e1e1e;
+}
+
+/* Joystick and Visualizer */
+#joyDiv {
+    margin: 0 auto;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background-color: #333;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.joystick {
+  border: 1px solid #444444;
+  border-radius: 10px;
+  padding: 20px;
+  background-color: #1e1e1e;
+}
+
+#visualiserDiv {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
     margin-top: 20px;
 }
 
-#logBlock {
-    overflow-y: auto;          /* vertical scrollbar when needed */
-    background-color: #fff;    /* white background */
-    border: 1px solid #ccc;    /* light border */
-    padding: 10px;             /* inner spacing */
-    height: 200px;             /* fixed height for better expansion */
-    min-height: 150px;         /* minimum height */
-    max-height: 300px;         /* maximum height */
-    text-align: left;          /* left align log text */
+canvas {
+    border: 2px solid #4CAF50;
+    border-radius: 6px;
 }
 
-#logBlock h4 {
-    margin: 0 0 8px;           /* tighten header spacing */
-    font-size: 1.1em;
-    text-align: center;        /* center the title */
+/* Dropdown Styling */
+.form-select {
+    width: 300px;
+    margin: 0 auto;
+    padding: 10px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    font-size: 14px;
 }
 
-.logContent, #logContent {
-    font-family: monospace;    /* fixed-width for logs */
-    font-size: 0.9em;
-    white-space: pre-wrap;     /* preserve line breaks */
-    word-break: break-word;
-    height: calc(100% - 30px); /* take full height minus title */
-    overflow-y: auto;          /* scroll within content area */
+/* Slider */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  background: #444444;
+  border-radius: 5px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #0d6efd;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #0d6efd;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Drive Values and Steering Algorithm */
+.drive-values {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.steering-algorithm {
+  margin-top: 20px;
+}
+
+/* Add transitions for smoother interactions */
+* {
+  transition: all 0.3s ease;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: bold; /* Bold text for headings */
+}
+
+label, .logs-title {
+  font-size: 1.1rem; /* Slightly larger font size for labels */
+  font-weight: bold; /* Bold text for important elements */
+}
+
+/* Interactive Elements */
+.tab-active {
+  color: #0d6efd; /* Highlight active tab */
+  border-bottom: 2px solid #0d6efd; /* Underline for active tab */
+}
+
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  background: #333333;
+  border-radius: 4px;
+  outline: none;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #0d6efd;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #0d6efd;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Spacing and Alignment */
+.container {
+  padding: 20px; /* Increased padding for spacing */
+}
+
+button, input, .logs-container {
+  margin-bottom: 15px; /* Consistent spacing between elements */
+}
+
+/* Add rounded corners to buttons and input fields */
+button, input {
+    border-radius: 8px;
+}
+
+/* Increase padding and margins between elements */
+button, input, .container {
+    padding: 10px;
+    margin: 10px;
+}
+
+/* Add subtle box shadows for buttons and containers */
+button, .container {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

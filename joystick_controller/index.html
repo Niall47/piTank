@@ -1,70 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1" name="viewport">
-  <title>PiTank</title>
-  <meta content="JoyStick" name="description">
-  <link href="bootstrap.min.css" rel="stylesheet">
-  <link href="style.css" rel="stylesheet">
-</head>
-<body class="text-center">
-<main class="pi-tank">
-  <div id="tabButtons">
-    <button class="tabButton active" onclick="openTab('controlTab')">Control</button> <button class="tabButton" onclick="openTab('connectTab')">Connect</button> <button class="tabButton" onclick="openTab('driveTab')">Drive</button>
-  </div>
-  <div class="tabContent" id="controlTab">
-    <div class="checkbox mb-3">
-      <label class="container">Compass steering 100% throttle <input checked="checked" id="compass" name="algorithm" onchange="changeSteeringAlgorithm()" type="radio"> <span class="checkmark"></span></label> <label class="container">Diff Steer <input id="diffsteer" name="algorithm" onchange="changeSteeringAlgorithm()" type="radio"> <span class="checkmark"></span></label> <label class="container">Experimental <input id="experimental" name="algorithm" onchange="changeSteeringAlgorithm()" type="radio"> <span class="checkmark"></span></label>
-    </div>
-    <div class="checkbox mb-3">
-      <label class="form-label" for="refreshRate" id="refreshRateText">Refresh rate</label> <input class="form-range" id="refreshRate" max="1000" min="100" onchange="rateUpdate()" step="20" type="range" value="200">
-    </div>
-  </div>
-  <div class="tabContent" id="connectTab">
-    <div class="form-floating"><button class="btn btn-secondary" id="connectionStatusBar">Connection status</button></div>
-    <br><hr><br>
-    <div class="form-floating" id="connectionBlock">
-      <button class="btn btn-secondary" id="scanButton" onclick="scan()">Scan Network</button>
-      
-    <br>
-    <h4>or</h4>
-    <br>
-    <div class="url-input-container">
-      <span class="url-prefix">ws://</span>
-      <input class="form-control ip-input" id="customIP" type="text" value="192.168.0.20" placeholder="IP Address">
-      <span class="url-separator">:</span>
-      <input class="form-control port-input" id="customPort" type="text" value="8081" placeholder="Port">
-    </div>
-    <br>
-    <button class="btn btn-secondary" id="connectButton" type="submit">Connect</button>
-  </div>
-  <br><hr><br>
-  <div class="logs-section">
-    <div id="logBlock">
-      <h4>Logs</h4>
-      <div id="logContent" class="logContent"></div>
-    </div>
-  </div>
-</div>
-
-  <div class="tabContent" id="driveTab" style="display: none;">
-    <div class="mt-5 mb-3" id="joyDiv"></div>
-    <pre id="direction">Joystick Values</pre>
-    <pre id="driveValues">Drive Values</pre>
-    <div id="visualiserDiv">
-      <canvas height="300" id="leftTrack" width="100"></canvas>
-      <canvas height="300" id="rightTrack" width="100"></canvas>
-    </div>
-  </div>
-</main>
-<script src="js/joy.js"></script>
-<script src="js/tankVisualiser.js"></script>
-<script src="js/steering.js"></script>
-<script src="js/joystickHandler.js"></script>
-<script src="js/socket.js"></script>
-<script src="js/ui.js"></script>
-<script src="js/connection.js"></script>
-<script src="js/tankInterface.js"></script>
-</body>
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>PiTank</title>
+    <meta content="JoyStick" name="description">
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+  </head>
+  <body class="text-center">
+    <main class="pi-tank">
+      <div id="tabButtons" class="ui-tabs-nav">
+        <button class="tabButton ui-tabs-active" onclick="openTab('connectTab')">Connect</button>
+        <button class="tabButton" onclick="openTab('driveTab')">Drive</button>
+        </br>
+        <div class="form-floating">
+          <button class="btn btn-secondary" id="connectionStatusBar">Connection status</button>
+        </div>
+      </div>
+      <div class="tabContent ui-tabs-panel" id="connectTab">
+        <br>
+        <hr>
+        <br>
+        <div class="form-floating" id="connectionBlock">
+          <button class="btn btn-secondary" id="scanButton" onclick="scan()">Scan Network</button>
+          <br>
+          <h4>or</h4>
+          <br>
+          <div class="url-input-container">
+            <span class="url-prefix">ws://</span>
+            <input class="form-control ip-input" id="customIP" type="text" value="192.168.0.20" placeholder="IP Address">
+            <span class="url-separator">:</span>
+            <input class="form-control port-input" id="customPort" type="text" value="8081" placeholder="Port">
+          </div>
+          <br>
+          <button class="btn btn-secondary" id="connectButton" type="submit">Connect</button>
+        </div>
+        <br>
+        <hr>
+        <br>
+        <div class="checkbox mb-3">
+          <label class="form-label" for="refreshRate" id="refreshRateText">Refresh rate</label>
+          <input class="form-range" id="refreshRate" max="1000" min="100" onchange="rateUpdate()" step="20" type="range" value="200">
+        </div>
+        <br>
+        <hr>
+        <br>
+        <div class="logs-section">
+          <div id="logBlock">
+            <h4>Logs</h4>
+            <div id="logContent" class="logContent"></div>
+            <br>
+            <a onclick="clearLogs()">clear</a>
+          </div>
+        </div>
+      </div>
+      <div class="tabContent ui-tabs-panel" id="driveTab" style="display: none;">
+        <div class="mt-5 mb-3" id="joyDiv"></div>
+        <pre id="direction">Joystick Values</pre>
+        <pre id="driveValues">Drive Values</pre>
+        <div id="visualiserDiv">
+          <canvas height="300" id="leftTrack" width="100"></canvas>
+          <canvas height="300" id="rightTrack" width="100"></canvas>
+        </div>
+        <div class="checkbox mb-3">
+          <label for="steeringAlgorithm" class="form-label">Steering Algorithm</label>
+          <select id="steeringAlgorithm" class="form-select" onchange="changeSteeringAlgorithm()">
+            <option value="compass" selected>Compass steering 100% throttle</option>
+            <option value="diffsteer">Diff Steer</option>
+            <option value="experimental">Experimental</option>
+          </select>
+        </div>
+      </div>
+    </main>
+    <script src="js/joy.js"></script>
+    <script src="js/tankVisualiser.js"></script>
+    <script src="js/steering.js"></script>
+    <script src="js/joystickHandler.js"></script>
+    <script src="js/socket.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/connection.js"></script>
+    <script src="js/tankInterface.js"></script>
+  </body>
 </html>
